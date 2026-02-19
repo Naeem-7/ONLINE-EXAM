@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Face Enrollment</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- ✅ Browser-safe Face API -->
+    <script defer src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #0f172a;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background: #020617;
+            padding: 30px;
+            border-radius: 12px;
+            width: 380px;
+            text-align: center;
+            box-shadow: 0 0 20px rgba(0,0,0,0.7);
+        }
+
+        h2 {
+            margin-bottom: 10px;
+        }
+
+        p {
+            font-size: 14px;
+            color: #94a3b8;
+        }
+
+        video {
+            width: 100%;
+            border-radius: 10px;
+            margin-top: 15px;
+            border: 2px solid #1e293b;
+        }
+
+        button {
+            margin-top: 20px;
+            padding: 12px;
+            width: 100%;
+            background: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #1d4ed8;
+        }
+
+        .status {
+            margin-top: 15px;
+            font-size: 14px;
+        }
+
+        .success {
+            color: #22c55e;
+        }
+
+        .error {
+            color: #ef4444;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Face Enrollment</h2>
+    <p>Please look straight into the camera</p>
+
+    <video id="video" autoplay muted></video>
+
+    <button onclick="registerFace()">Register Face</button>
+
+    <div id="status" class="status"></div>
+</div>
+
+<script>
+    const video = document.getElementById("video");
+    const statusDiv = document.getElementById("status");
+
+    // ✅ Student regno from login
+    const STUDENT_ID = localStorage.getItem("regno");
+
+    let modelsLoaded = false;
+
+    /* ==========================
+       WAIT FOR FACE-API TO LOAD
+    ========================== */
+    async function waitForFaceAPI() {
+        return new Promise(resolve => {
+            const check = setInterval(() => {
+                if (window.faceapi) {
+                    clearInterval(check);
+                    resolve();
+                }
+            }, 100);
+        });
+    }
+
+    /* ==========================
+       START WEBCAM
+    ========================== */
+    navigator.mediaDevices.getUserMedia({
+        video: { width: 640, height: 480 }
+    })
+        .then(stream => {
+            video.srcObject = stream;
+        })
+        .catch(() => {
+            statusDiv.innerHTML = "<span class='error'>Webcam access denied</span>";
+        });
+
+    /* ==========================
+       LOAD FACE-API MODELS
+       🔒 FORCE SSD (NO TINY)
+    ========================== */
+    async function loadModels() {
+        if (modelsLoaded) return;
+
+        statusDiv.innerHTML = "Loading AI models...";
+
+        await waitForFaceAPI();
+
+        await faceapi.nets.ssdMobilenetv1.loadFromUri("http://localhost:3000/models");
+        await faceapi.nets.faceLandmark68Net.loadFromUri("http://localhost:3000/models");
+        await faceapi.nets.faceRecognitionNet.loadFromUri("http://localhost:3000/models");
+
+        modelsLoaded = true;
+        console.log("✅ Face-API models loaded");
+    }
+
+    /* ==========================
+       FACE ENROLLMENT
+    ========================== */
+    async function registerFace() {
+        try {
+            if (!STUDENT_ID) {
+                statusDiv.innerHTML =
+                    "<span class='error'>Student not logged in</span>";
+                return;
+            }
+
+            await loadModels();
+
+            if (video.readyState < 3) {
+                statusDiv.innerHTML =
+                    "<span class='error'>Camera is warming up… try again</span>";
+                return;
+            }
+
+            statusDiv.innerHTML = "Detecting face... Look at the camera";
+
+            const detection = await faceapi
+                .detectSingleFace(
+                    video,
+                    new faceapi.SsdMobilenetv1Options({ minConfidence: 0.5 })
+                )
+                .withFaceLandmarks()
+                .withFaceDescriptor();
+
+            if (!detection) {
+                statusDiv.innerHTML =
+                    "<span class='error'>No face detected. Keep face centered.</span>";
+                return;
+            }
+
+            // ✅ MUST BE 128 LENGTH
+            const descriptor = Array.from(detection.descriptor);
+            console.log("Descriptor length:", descriptor.length);
+
+            statusDiv.innerHTML = "Registering face securely...";
+
+            const res = await fetch("http://localhost:3000/api/face/register", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    student_id: STUDENT_ID,
+                    descriptor: descriptor
+                })
+            });
+
+            const data = await res.json();
+
+            if (data.success) {
+                statusDiv.innerHTML =
+                    "<span class='success'>Face enrolled successfully ✅</span>";
+
+                setTimeout(() => {
+                    window.location.href = "login.html";
+                }, 2000);
+
+            } else {
+                statusDiv.innerHTML =
+                    "<span class='error'>Enrollment failed</span>";
+            }
+
+        } catch (err) {
+            console.error(err);
+            statusDiv.innerHTML =
+                "<span class='error'>Server error</span>";
+        }
+    }
+</script>
+
+
+
+</body>
+</html>

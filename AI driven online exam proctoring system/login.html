@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Exam Login</title>
+
+    <style>
+        /* ---------- Unique Abstract Geometric Background ---------- */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: "Poppins", sans-serif;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            background: linear-gradient(135deg, #0c0c2e, #1a1a4a, #2d2d6e);
+            position: relative;
+        }
+
+        /* Abstract geometric background */
+        .abstract-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.7;
+        }
+
+        /* Large geometric shapes */
+        .geo-shape {
+            position: absolute;
+            opacity: 0.1;
+            animation: geoPulse 8s infinite ease-in-out;
+        }
+
+        .geo-1 {
+            width: 400px;
+            height: 400px;
+            top: -150px;
+            right: -100px;
+            background: linear-gradient(45deg, #ff6b6b, #ffa36b);
+            clip-path: polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%);
+            animation-delay: 0s;
+        }
+
+        .geo-2 {
+            width: 300px;
+            height: 300px;
+            bottom: -100px;
+            left: -50px;
+            background: linear-gradient(45deg, #4ecdc4, #44a08d);
+            clip-path: polygon(20% 0%, 80% 0%, 100% 100%, 0% 100%);
+            animation-delay: 2s;
+        }
+
+        .geo-3 {
+            width: 350px;
+            height: 350px;
+            top: 50%;
+            left: 80%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(45deg, #ffd166, #ff9e64);
+            clip-path: circle(50% at 50% 50%);
+            animation-delay: 4s;
+        }
+
+        /* Dynamic grid lines */
+        .grid-lines {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            animation: gridMove 20s infinite linear;
+        }
+
+        @keyframes gridMove {
+            0% {
+                background-position: 0 0;
+            }
+            100% {
+                background-position: 50px 50px;
+            }
+        }
+
+        /* Floating orbs */
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(15px);
+            animation: orbFloat 15s infinite ease-in-out;
+        }
+
+        .orb-1 {
+            width: 150px;
+            height: 150px;
+            top: 20%;
+            left: 10%;
+            background: radial-gradient(circle, rgba(74, 144, 226, 0.4), transparent 70%);
+            animation-delay: 0s;
+        }
+
+        .orb-2 {
+            width: 200px;
+            height: 200px;
+            top: 60%;
+            left: 80%;
+            background: radial-gradient(circle, rgba(255, 107, 107, 0.3), transparent 70%);
+            animation-delay: 3s;
+        }
+
+        .orb-3 {
+            width: 100px;
+            height: 100px;
+            top: 80%;
+            left: 20%;
+            background: radial-gradient(circle, rgba(255, 206, 86, 0.3), transparent 70%);
+            animation-delay: 6s;
+        }
+
+        @keyframes orbFloat {
+            0%, 100% {
+                transform: translateY(0) scale(1);
+            }
+            50% {
+                transform: translateY(-30px) scale(1.1);
+            }
+        }
+
+        @keyframes geoPulse {
+            0%, 100% {
+                opacity: 0.1;
+                transform: scale(1) rotate(0deg);
+            }
+            50% {
+                opacity: 0.15;
+                transform: scale(1.05) rotate(5deg);
+            }
+        }
+
+        /* ---------- Login Card ---------- */
+        .login-box {
+            width: 360px;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 18px;
+            backdrop-filter: blur(12px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .login-box:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
+        }
+
+        .login-box h2 {
+            text-align: center;
+            margin-bottom: 25px;
+            font-size: 26px;
+            font-weight: 600;
+            color: #1e3c57;
+        }
+
+        label {
+            font-size: 14px;
+            font-weight: 500;
+            color: #1e3c57;
+        }
+
+        .input-group {
+            margin-bottom: 18px;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            outline: none;
+            margin-top: 6px;
+            font-size: 15px;
+            background: rgba(255, 255, 255, 0.9);
+            color: #000;
+            transition: all 0.3s ease;
+        }
+
+        .input-group input:focus {
+            border-color: #64b5f6;
+            box-shadow: 0 0 0 3px rgba(100, 181, 246, 0.2);
+        }
+
+        .warning {
+            color: #c62828;
+            font-size: 13px;
+            display: none;
+            margin-top: 5px;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 12px;
+            background: #1e88e5;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: 0.3s;
+            font-weight: 500;
+        }
+
+        .login-btn:hover {
+            background: #1565c0;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(30, 136, 229, 0.3);
+        }
+
+        .signup-text {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 14px;
+            color: #1e3c57;
+        }
+
+        .signup-text a {
+            color: #0d47a1;
+            font-weight: 500;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .signup-text a:hover {
+            color: #1e88e5;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Abstract geometric background -->
+    <div class="abstract-bg">
+        <div class="geo-shape geo-1"></div>
+        <div class="geo-shape geo-2"></div>
+        <div class="geo-shape geo-3"></div>
+        <div class="grid-lines"></div>
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+    </div>
+
+    <!-- Login form -->
+    <div class="login-box">
+        <h2>Student Login</h2>
+
+        <!-- Register Number -->
+        <div class="input-group">
+            <label>Register Number</label>
+            <input type="text" id="regno" placeholder="Enter register number">
+            <div id="regWarn" class="warning">Invalid register number</div>
+        </div>
+
+        <!-- Password -->
+        <div class="input-group">
+            <label>Password (YYYYMMDD)</label>
+            <input type="password" id="password" placeholder="Enter date of birth">
+            <div id="passWarn" class="warning">Invalid password format</div>
+        </div>
+
+        <button class="login-btn" onclick="validateLogin()">Login</button>
+
+        <p class="signup-text">
+            Don't have an account? <a href="signup.html">Sign up</a>
+        </p>
+    </div>
+<script>
+function validateLogin() {
+    let reg = document.getElementById("regno").value.trim();
+    let pass = document.getElementById("password").value.trim();
+    let regWarn = document.getElementById("regWarn");
+    let passWarn = document.getElementById("passWarn");
+
+    let valid = true;
+    const regPattern = /^.+$/;
+    const passPattern = /^[0-9]{8}$/;
+
+    // Validate Register Number
+    regWarn.style.display = regPattern.test(reg) ? "none" : "block";
+    if (!regPattern.test(reg)) valid = false;
+
+    // Validate Password
+    passWarn.style.display = passPattern.test(pass) ? "none" : "block";
+    if (!passPattern.test(pass)) valid = false;
+
+    if (!valid) return;
+
+    // Backend login
+    fetch("http://localhost:3000/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ regno: reg, password: pass })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success && data.user && data.user.regno) {
+
+            // ✅ CLEAR OLD STORAGE (SAFETY)
+            localStorage.clear();
+
+            // ✅ FIX (CRITICAL): STORE REGNO
+            localStorage.setItem("regno", data.user.regno);
+
+            // ✅ STORE REQUIRED STUDENT INFO
+            localStorage.setItem("student_id", data.user.id || data.user.regno);   // fallback to regno
+            localStorage.setItem("register_number", data.user.regno);             // main ID
+            localStorage.setItem("student_name", data.user.fullname || "Unknown");
+            localStorage.setItem("studentToken", data.token);
+
+            // ✅ STORE ADDITIONAL STUDENT INFO
+            localStorage.setItem("dob", data.user.dob || "");                      // Date of birth
+
+            // ---------------------- UPDATED CLASSVALUE LOGIC ----------------------
+            localStorage.setItem("classvalue", (data.user.classvalue || "").trim());
+            // ---------------------------------------------------------------------
+
+            localStorage.setItem("department", data.user.dept || "");              // Department
+
+            // ✅ STORE EXAM INFO IF AVAILABLE
+            if (data.exam) {
+                localStorage.setItem("subject", data.exam.subject || "");
+                localStorage.setItem("totalQuestions", data.exam.totalQuestions || 0);
+                localStorage.setItem("totalMarks", data.exam.totalMarks || 0);
+            } else {
+                localStorage.setItem("subject", data.exam_title || data.subject || "");
+            }
+
+            // ✅ STORE RESULT INFO IF AVAILABLE
+            if (data.result) {
+                localStorage.setItem("correct_count", data.result.correct || 0);
+                localStorage.setItem("wrong_count", data.result.wrong || 0);
+                localStorage.setItem("scorePercent", data.result.scorePercent || 0);
+                localStorage.setItem("integrity_percent", data.result.integrityPercent || 100);
+            }
+
+            // ✅ DEBUG CHECK
+            console.log("Logged in as:", data.user.regno);
+            console.log(
+                "Classvalue:", localStorage.getItem("classvalue"),
+                "DOB:", localStorage.getItem("dob"),
+                "Department:", localStorage.getItem("department"),
+                "Subject:", localStorage.getItem("subject")
+            );
+
+            // Redirect to dashboard
+            window.location.href = "student_dashboard.html";
+
+        } else {
+            alert(data.message || "Invalid credentials");
+        }
+    })
+    .catch(err => {
+        console.error("Login error:", err);
+        alert("Server error. Try again later.");
+    });
+}
+
+// Enter key triggers login
+document.addEventListener("keypress", function(e) {
+    if (e.key === "Enter") validateLogin();
+});
+</script>
+
+
+</body>
+</html>

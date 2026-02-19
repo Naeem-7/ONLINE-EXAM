@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Login</title>
+
+    <style>
+        /* ---------- Unique Abstract Geometric Background ---------- */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: "Poppins", sans-serif;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            background: linear-gradient(135deg, #0c0c2e, #1a1a4a, #2d2d6e);
+            position: relative;
+        }
+
+        /* Abstract geometric background */
+        .abstract-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.7;
+        }
+
+        /* Large geometric shapes */
+        .geo-shape {
+            position: absolute;
+            opacity: 0.1;
+            animation: geoPulse 8s infinite ease-in-out;
+        }
+
+        .geo-1 {
+            width: 400px;
+            height: 400px;
+            top: -150px;
+            right: -100px;
+            background: linear-gradient(45deg, #ff6b6b, #ffa36b);
+            clip-path: polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%);
+            animation-delay: 0s;
+        }
+
+        .geo-2 {
+            width: 300px;
+            height: 300px;
+            bottom: -100px;
+            left: -50px;
+            background: linear-gradient(45deg, #4ecdc4, #44a08d);
+            clip-path: polygon(20% 0%, 80% 0%, 100% 100%, 0% 100%);
+            animation-delay: 2s;
+        }
+
+        .geo-3 {
+            width: 350px;
+            height: 350px;
+            top: 50%;
+            left: 80%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(45deg, #ffd166, #ff9e64);
+            clip-path: circle(50% at 50% 50%);
+            animation-delay: 4s;
+        }
+
+        /* Dynamic grid lines */
+        .grid-lines {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            animation: gridMove 20s infinite linear;
+        }
+
+        @keyframes gridMove {
+            0% {
+                background-position: 0 0;
+            }
+            100% {
+                background-position: 50px 50px;
+            }
+        }
+
+        /* Floating orbs */
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(15px);
+            animation: orbFloat 15s infinite ease-in-out;
+        }
+
+        .orb-1 {
+            width: 150px;
+            height: 150px;
+            top: 20%;
+            left: 10%;
+            background: radial-gradient(circle, rgba(74, 144, 226, 0.4), transparent 70%);
+            animation-delay: 0s;
+        }
+
+        .orb-2 {
+            width: 200px;
+            height: 200px;
+            top: 60%;
+            left: 80%;
+            background: radial-gradient(circle, rgba(255, 107, 107, 0.3), transparent 70%);
+            animation-delay: 3s;
+        }
+
+        .orb-3 {
+            width: 100px;
+            height: 100px;
+            top: 80%;
+            left: 20%;
+            background: radial-gradient(circle, rgba(255, 206, 86, 0.3), transparent 70%);
+            animation-delay: 6s;
+        }
+
+        @keyframes orbFloat {
+            0%, 100% {
+                transform: translateY(0) scale(1);
+            }
+            50% {
+                transform: translateY(-30px) scale(1.1);
+            }
+        }
+
+        @keyframes geoPulse {
+            0%, 100% {
+                opacity: 0.1;
+                transform: scale(1) rotate(0deg);
+            }
+            50% {
+                opacity: 0.15;
+                transform: scale(1.05) rotate(5deg);
+            }
+        }
+
+        /* ---------- Login Card ---------- */
+        .login-box {
+            width: 380px;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 18px;
+            backdrop-filter: blur(12px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .login-box:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
+        }
+
+        .login-box h2 {
+            text-align: center;
+            margin-bottom: 25px;
+            font-size: 26px;
+            font-weight: 600;
+            color: #1e3c57;
+        }
+
+        label {
+            font-size: 14px;
+            font-weight: 500;
+            color: #1e3c57;
+            display: block;
+            margin: 12px 0 5px;
+        }
+
+        .input-group {
+            margin-bottom: 18px;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            outline: none;
+            margin-top: 6px;
+            font-size: 15px;
+            background: rgba(255, 255, 255, 0.9);
+            color: #000;
+            transition: all 0.3s ease;
+        }
+
+        .input-group input:focus {
+            border-color: #64b5f6;
+            box-shadow: 0 0 0 3px rgba(100, 181, 246, 0.2);
+        }
+
+        .error {
+            color: #c62828;
+            font-size: 13px;
+            display: none;
+            margin-top: 5px;
+            text-align: center;
+            padding: 12px;
+            background: rgba(231, 76, 60, 0.1);
+            border-radius: 8px;
+            border-left: 4px solid #e74c3c;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 12px;
+            background: #1e88e5;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: 0.3s;
+            font-weight: 500;
+        }
+
+        .login-btn:hover {
+            background: #1565c0;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(30, 136, 229, 0.3);
+        }
+
+        .copyright {
+            text-align: center;
+            margin-top: 20px;
+            color: #777;
+            font-size: 14px;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Abstract geometric background -->
+    <div class="abstract-bg">
+        <div class="geo-shape geo-1"></div>
+        <div class="geo-shape geo-2"></div>
+        <div class="geo-shape geo-3"></div>
+        <div class="grid-lines"></div>
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+    </div>
+
+    <!-- Login form -->
+    <div class="login-box">
+        <h2>Admin Login</h2>
+
+        <!-- Admin ID -->
+        <div class="input-group">
+            <label>Admin ID</label>
+            <input type="text" id="adminId" placeholder="Enter Admin ID">
+        </div>
+
+        <!-- Password -->
+        <div class="input-group">
+            <label>Password</label>
+            <input type="password" id="password" placeholder="Enter Password">
+        </div>
+
+        <button class="login-btn" onclick="adminLogin()">Login</button>
+
+        <p class="error" id="errorMsg">Invalid Admin ID or Password</p>
+        
+    </div>
+
+   <script>
+async function adminLogin() {
+    let adminId = document.getElementById("adminId").value.trim();
+    let password = document.getElementById("password").value.trim();
+
+    if (!adminId || !password) {
+        showError("Please enter Admin ID and Password");
+        return;
+    }
+
+    try {
+        const response = await fetch("http://localhost:3000/api/admins/login", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ adminId, password })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            showError(data.message || "Login failed");
+            return;
+        }
+
+        if (data.success) {
+
+            // ✅ MAKE SURE TOKEN EXISTS
+            if (!data.token) {
+                showError("Login failed: Token not received");
+                return;
+            }
+
+            // ✅ SAVE TOKEN
+            localStorage.setItem("adminToken", data.token);
+
+            const button = document.querySelector(".login-btn");
+            button.innerHTML = "Logging in...";
+            button.disabled = true;
+
+            setTimeout(() => {
+                window.location.href = "admin_dashboard.html";
+            }, 500);
+
+        } else {
+            showError(data.message);
+        }
+
+    } catch (error) {
+        showError("Server not reachable");
+    }
+}
+
+function showError(msg) {
+    const error = document.getElementById("errorMsg");
+    error.innerText = msg;
+    error.style.display = "block";
+}
+</script>
+
+</body>
+</html>

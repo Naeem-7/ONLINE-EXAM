@@ -1,0 +1,1044 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Proctoring System - Live Proctoring Dashboard</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+<link rel="icon" href="favicon.ico" type="image/x-icon">
+<style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3a0ca3;
+            --danger-color: #f72585;
+            --warning-color: #ff9e00;
+            --success-color: #4cc9f0;
+            --light-color: #f8f9fa;
+            --dark-color: #212529;
+            --gray-color: #6c757d;
+            --border-color: #dee2e6;
+            --header-height: 70px;
+        }
+
+        body {
+            background-color: #f5f7fb;
+            color: var(--dark-color);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* Header Styles */
+        .header {
+            height: var(--header-height);
+            background-color: white;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 30px;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            margin-right: 30px;
+        }
+
+        .logo h2 {
+            color: var(--primary-color);
+            font-size: 1.5rem;
+            margin-left: 10px;
+        }
+
+        .logo-icon {
+            color: var(--primary-color);
+            font-size: 1.8rem;
+        }
+
+        .header-left h1 {
+            font-size: 1.5rem;
+            color: var(--dark-color);
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+        }
+
+        .stats-card {
+            display: inline-flex;
+            align-items: center;
+            background-color: var(--light-color);
+            padding: 8px 15px;
+            border-radius: 20px;
+            margin-right: 15px;
+            font-size: 0.9rem;
+        }
+
+        .stats-card i {
+            margin-right: 8px;
+            color: var(--primary-color);
+        }
+
+        .alert-badge {
+            background-color: var(--danger-color);
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-left: 8px;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            padding-left: 15px;
+            border-left: 1px solid var(--border-color);
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            margin-right: 12px;
+        }
+
+        .user-info h4 {
+            font-size: 0.9rem;
+            margin-bottom: 4px;
+        }
+
+        .user-info p {
+            font-size: 0.8rem;
+            color: var(--gray-color);
+        }
+
+        .content {
+            padding: 30px;
+            flex-grow: 1;
+        }
+
+        .page-title {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .page-title h2 {
+            color: var(--dark-color);
+            font-size: 1.8rem;
+        }
+
+        .page-title p {
+            color: var(--gray-color);
+            margin-top: 5px;
+        }
+
+        .control-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 6px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .btn i {
+            margin-right: 8px;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--secondary-color);
+        }
+
+        .btn-outline {
+            background-color: white;
+            color: var(--primary-color);
+            border: 1px solid var(--primary-color);
+        }
+
+        .btn-outline:hover {
+            background-color: rgba(67, 97, 238, 0.1);
+        }
+
+        .btn-danger {
+            background-color: var(--danger-color);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: #d1145a;
+        }
+
+        /* Dashboard Grid */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-bottom: 25px;
+        }
+
+        @media (max-width: 1200px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-header h3 {
+            font-size: 1.2rem;
+            color: var(--dark-color);
+        }
+
+        .card-body {
+            padding: 20px;
+        }
+
+        /* Candidate Grid */
+        .candidate-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .candidate-card {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            transition: transform 0.3s;
+        }
+
+        .candidate-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .candidate-header {
+            padding: 15px;
+            background-color: var(--light-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .candidate-info {
+            display: flex;
+            align-items: center;
+        }
+
+        .candidate-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            margin-right: 12px;
+        }
+
+        .candidate-details h4 {
+            font-size: 1rem;
+            margin-bottom: 4px;
+        }
+
+        .candidate-details p {
+            font-size: 0.8rem;
+            color: var(--gray-color);
+        }
+
+        .candidate-status {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .status-active {
+            background-color: rgba(76, 201, 240, 0.2);
+            color: var(--success-color);
+        }
+
+        .status-warning {
+            background-color: rgba(255, 158, 0, 0.2);
+            color: var(--warning-color);
+        }
+
+        .status-danger {
+            background-color: rgba(247, 37, 133, 0.2);
+            color: var(--danger-color);
+        }
+
+        .video-container {
+            height: 200px;
+            background-color: #1a1a2e;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .video-container video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Removed video-overlay styles */
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .candidate-metrics {
+            padding: 15px;
+            display: flex;
+            justify-content: space-around;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .metric {
+            text-align: center;
+        }
+
+        .metric-value {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .metric-label {
+            font-size: 0.8rem;
+            color: var(--gray-color);
+        }
+
+        .metric-risk {
+            color: var(--danger-color);
+        }
+
+        .metric-normal {
+            color: var(--success-color);
+        }
+
+        .candidate-actions {
+            padding: 15px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .action-btn {
+            padding: 8px 15px;
+            border-radius: 4px;
+            border: none;
+            font-size: 0.85rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .action-btn i {
+            margin-right: 5px;
+        }
+
+        .action-btn-primary {
+            background-color: rgba(67, 97, 238, 0.1);
+            color: var(--primary-color);
+        }
+
+        .action-btn-primary:hover {
+            background-color: rgba(67, 97, 238, 0.2);
+        }
+
+        /* Alerts Panel */
+        .alerts-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .alert-item {
+            padding: 15px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+        }
+
+        .alert-item:last-child {
+            border-bottom: none;
+        }
+
+        .alert-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-size: 1.2rem;
+        }
+
+        .alert-danger {
+            background-color: rgba(247, 37, 133, 0.1);
+            color: var(--danger-color);
+        }
+
+        .alert-warning {
+            background-color: rgba(255, 158, 0, 0.1);
+            color: var(--warning-color);
+        }
+
+        .alert-info {
+            background-color: rgba(67, 97, 238, 0.1);
+            color: var(--primary-color);
+        }
+
+        .alert-content h4 {
+            font-size: 0.95rem;
+            margin-bottom: 4px;
+        }
+
+        .alert-content p {
+            font-size: 0.8rem;
+            color: var(--gray-color);
+        }
+
+        .alert-time {
+            font-size: 0.75rem;
+            color: var(--gray-color);
+            margin-top: 4px;
+        }
+
+        /* Exam Info */
+        .exam-info-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .exam-info-item:last-child {
+            border-bottom: none;
+        }
+
+        .exam-info-label {
+            color: var(--gray-color);
+        }
+
+        .exam-info-value {
+            font-weight: 600;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background-color: white;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 500px;
+            overflow: hidden;
+        }
+
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h3 {
+            color: var(--dark-color);
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--gray-color);
+        }
+
+        .modal-body {
+            padding: 20px;
+        }
+
+        .modal-footer {
+            padding: 15px 20px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .candidate-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header {
+                padding: 0 15px;
+            }
+            
+            .content {
+                padding: 20px 15px;
+            }
+            
+            .control-buttons {
+                flex-wrap: wrap;
+            }
+            
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header {
+                flex-direction: column;
+                height: auto;
+                padding: 15px;
+            }
+            
+            .header-left {
+                width: 100%;
+                justify-content: space-between;
+                margin-bottom: 15px;
+            }
+            
+            .header-right {
+                width: 100%;
+                justify-content: space-between;
+            }
+            
+            .stats-card {
+                margin-right: 5px;
+                font-size: 0.8rem;
+                padding: 6px 10px;
+            }
+            
+            .user-profile {
+                border-left: none;
+                padding-left: 0;
+            }
+            
+            .page-title {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header: video & flag icons kept, active exams & user profile removed, admin text added -->
+    <div class="header">
+        <div class="header-left">
+            <h1>Live Proctoring Dashboard</h1>
+        </div>
+        <div class="header-right">
+            <div class="stats-card">
+                <i class="fas fa-video"></i>
+                <span id="activeCandidatesCount">0 Candidates</span>
+                <!-- pink alert badge removed -->
+            </div>
+            <div class="stats-card">
+                <i class="fas fa-flag"></i>
+                <span id="violationCount">0 Violations</span>
+            </div>
+            <span style="font-weight: 500; color: var(--gray-color);">admin</span>
+        </div>
+    </div>
+
+    <!-- Content -->
+    <div class="content">
+        <div class="page-title">
+            <div>
+                <h2 id="examTitle">Mathematics Final Exam - Live Session</h2>
+                <p>Monitor all candidates in real-time with AI-powered proctoring</p>
+            </div>
+            <!-- End Session and Settings buttons removed -->
+        </div>
+
+        <div class="dashboard-grid">
+            <!-- Exam Information Card -->
+            <div class="card">
+                <div class="card-header">
+                    <h3>Exam Information</h3>
+                    <span class="candidate-status status-active" id="examStatus">IN PROGRESS</span>
+                </div>
+                <div class="card-body">
+                    <div class="exam-info-item">
+                        <span class="exam-info-label">Exam Title:</span>
+                        <span class="exam-info-value" id="infoTitle">Mathematics Final Exam</span>
+                    </div>
+                    <div class="exam-info-item">
+                        <span class="exam-info-label">Exam Code:</span>
+                        <span class="exam-info-value" id="infoCode">MATH-2023-FINAL</span>
+                    </div>
+                    <div class="exam-info-item">
+                        <span class="exam-info-label">Duration:</span>
+                        <span class="exam-info-value" id="infoDuration">2 Hours 30 Minutes</span>
+                    </div>
+                    <div class="exam-info-item">
+                        <span class="exam-info-label">Started:</span>
+                        <span class="exam-info-value" id="infoStarted">09:00 AM (45 minutes ago)</span>
+                    </div>
+                    <div class="exam-info-item">
+                        <span class="exam-info-label">Candidates:</span>
+                        <span class="exam-info-value" id="infoCandidates">0 enrolled, 0 active, 0 disconnected</span>
+                    </div>
+                    <div class="exam-info-item">
+                        <span class="exam-info-label">Violations:</span>
+                        <span class="exam-info-value" id="infoViolations">0</span>
+                    </div>
+                    <div class="exam-info-item">
+                        <span class="exam-info-label">AI Proctoring:</span>
+                        <span class="exam-info-value" id="infoProctoring">
+                            <span style="color: var(--success-color);">Active</span>
+                            (Face detection, Eye tracking, Audio monitoring)
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AI Alerts Card -->
+            <div class="card">
+                <div class="card-header">
+                    <h3>Recent AI Alerts</h3>
+                    <span class="alert-badge" id="alertsBadge">0</span>
+                </div>
+                <div class="card-body">
+                    <div class="alerts-list" id="alertsList">
+                        <!-- Alerts will be dynamically injected here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Candidates Grid -->
+        <div class="card">
+            <div class="card-header">
+                <h3>Live Candidate Monitoring</h3>
+                <div>
+                    <span style="color: var(--gray-color); font-size: 0.9rem;">Sort by: </span>
+                    <select id="sortCandidates" style="padding: 5px 10px; border-radius: 4px; border: 1px solid var(--border-color);">
+                        <option>Risk Level</option>
+                        <option>Name</option>
+                        <option>ID</option>
+                        <option>Connection</option>
+                    </select>
+                </div>
+            </div>
+            <div class="card-body">
+                <!-- Candidate Grid for JS -->
+                <div class="candidate-grid" id="candidateGrid">
+                    <!-- Candidate cards will be dynamically generated here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- End Session Modal -->
+    <div class="modal" id="endSessionModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>End Exam Session</h3>
+                <button class="modal-close" id="closeEndSessionModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to end this exam session for all candidates?</p>
+                <div class="form-group">
+                    <label for="endReason">Reason for ending session (optional):</label>
+                    <select class="form-control" id="endReason">
+                        <option value="">Select a reason</option>
+                        <option value="time_up">Exam time completed</option>
+                        <option value="technical_issue">Technical issues</option>
+                        <option value="violations">Multiple violations detected</option>
+                        <option value="emergency">Emergency situation</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="endMessage">Message to candidates (optional):</label>
+                    <textarea class="form-control" id="endMessage" rows="3" placeholder="This message will be displayed to all candidates when the session ends."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" id="cancelEndSession">Cancel</button>
+                <button class="btn btn-danger" id="confirmEndSession">End Session for All</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div class="modal" id="settingsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Proctoring Settings</h3>
+                <button class="modal-close" id="closeSettingsModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <!-- AI Monitoring Sensitivity -->
+                <div class="form-group">
+                    <label>AI Monitoring Sensitivity</label>
+                    <div style="display: flex; align-items: center; margin-top: 10px;">
+                        <span style="margin-right: 10px; color: var(--gray-color);">Low</span>
+                        <input type="range" min="1" max="10" value="7" class="form-control" style="flex-grow: 1; padding: 0;">
+                        <span style="margin-left: 10px; color: var(--gray-color);">High</span>
+                    </div>
+                </div>
+
+                <!-- Alert Threshold -->
+                <div class="form-group">
+                    <label>Alert Threshold</label>
+                    <div style="display: flex; align-items: center; margin-top: 10px;">
+                        <span style="margin-right: 10px; color: var(--gray-color);">Fewer Alerts</span>
+                        <input type="range" min="1" max="10" value="5" class="form-control" style="flex-grow: 1; padding: 0;">
+                        <span style="margin-left: 10px; color: var(--gray-color);">More Alerts</span>
+                    </div>
+                </div>
+
+                <!-- Toggles -->
+                <div class="form-group"><label><input type="checkbox" checked> Enable Face Detection</label></div>
+                <div class="form-group"><label><input type="checkbox" checked> Enable Eye Tracking</label></div>
+                <div class="form-group"><label><input type="checkbox" checked> Enable Audio Monitoring</label></div>
+                <div class="form-group"><label><input type="checkbox"> Enable Screen Recording</label></div>
+                <div class="form-group"><label><input type="checkbox" checked> Auto-flag suspicious behavior</label></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" id="cancelSettings">Cancel</button>
+                <button class="btn btn-primary" id="saveSettings">Save Settings</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Action Confirmation Modal -->
+    <div class="modal" id="actionModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="actionModalTitle">Send Warning to Candidate</h3>
+                <button class="modal-close" id="closeActionModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p id="actionModalText">Are you sure you want to send a warning to this candidate?</p>
+                <div class="form-group">
+                    <label for="actionReason">Reason for action:</label>
+                    <select class="form-control" id="actionReason">
+                        <option value="">Select a reason</option>
+                        <option value="violation">Exam violation detected</option>
+                        <option value="suspicious">Suspicious behavior</option>
+                        <option value="technical">Technical issue</option>
+                        <option value="assistance">Candidate requested assistance</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="actionMessage">Message to candidate:</label>
+                    <textarea class="form-control" id="actionMessage" rows="3" placeholder="This message will be displayed to the candidate."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" id="cancelAction">Cancel</button>
+                <button class="btn btn-primary" id="confirmAction">Confirm Action</button>
+            </div>
+        </div>
+    </div>
+</body>
+
+<script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+<script>
+const API_BASE = "http://localhost:3000/api/admin";
+
+/* ===============================
+   GET EXAM ID
+=============================== */
+const params = new URLSearchParams(window.location.search);
+const examId = params.get("exam_id") || params.get("examId");
+
+if (!examId) {
+    alert("Exam ID missing");
+    throw new Error("Exam ID not provided");
+}
+
+/* ===============================
+   STATE
+=============================== */
+let candidates = [];
+let alerts = [];
+let examInfo = {};
+let examStats = {};
+
+/* ===============================
+   SOCKET
+=============================== */
+const socket = io("http://localhost:3000", {
+    transports: ["websocket"]
+});
+
+socket.on("connect", () => {
+    socket.emit("join_exam", { exam_id: examId, role: "admin" });
+});
+
+/* 🔥 Real-time student join/disconnect */
+socket.on("student_joined", ({ regno, totalActive }) => {
+    const student = candidates.find(c => c.regno === regno);
+    if (student) {
+        student.is_online = true;
+        renderCandidates();
+    }
+    document.getElementById("activeCandidatesCount").innerText = totalActive;
+});
+
+socket.on("exam_update", ({ totalActive }) => {
+    candidates.forEach(c => {
+        c.is_online = c.is_online && totalActive > 0; // update online count
+    });
+    renderCandidates();
+    document.getElementById("activeCandidatesCount").innerText = totalActive;
+});
+
+socket.on("admin-warning", warning => {
+    alerts.unshift(warning);
+    document.getElementById("alertsBadge").innerText = alerts.length;
+    renderAlerts();
+});
+
+/* ===============================
+   FETCH FUNCTIONS
+=============================== */
+async function fetchExamInfo() {
+    const res = await fetch(`${API_BASE}/exam-info/${examId}`);
+    const data = await res.json();
+
+    if (data.success) {
+        examInfo = data.exam;
+        renderExamInfo();
+    }
+}
+
+async function fetchCandidates() {
+    const res = await fetch(`${API_BASE}/live-candidates/${examId}`);
+    const data = await res.json();
+
+    if (data.success) {
+        candidates = data.candidates.map(c => ({
+            ...c,
+            is_online: c.is_online || false
+        }));
+        renderCandidates();
+    }
+}
+
+async function fetchStats() {
+    const res = await fetch(`${API_BASE}/exam-stats/${examId}`);
+    const data = await res.json();
+
+    if (data.success) {
+        examStats = data.stats;
+        renderStats();
+    }
+}
+
+async function fetchAlerts() {
+    const res = await fetch(`${API_BASE}/exam-alerts/${examId}`);
+    const data = await res.json();
+
+    if (data.success) {
+        alerts = data.alerts;
+        document.getElementById("alertsBadge").innerText = alerts.length;
+        renderAlerts();
+    }
+}
+
+/* ===============================
+   RENDER FUNCTIONS
+=============================== */
+function renderExamInfo() {
+    document.getElementById("examTitle").innerText =
+        `${examInfo.exam_title} - Live Session`;
+
+    document.getElementById("infoTitle").innerText =
+        examInfo.exam_title;
+
+    document.getElementById("infoCode").innerText =
+        examInfo.exam_code;
+
+    document.getElementById("infoDuration").innerText =
+        examInfo.duration;
+
+    document.getElementById("infoStarted").innerText =
+        new Date(examInfo.start_time).toLocaleString();
+
+    document.getElementById("examStatus").innerText =
+        examInfo.status.toUpperCase();
+}
+
+function renderStats() {
+    document.getElementById("infoCandidates").innerText =
+        `${examStats.totalCandidates} enrolled, ${examStats.activeCandidates} active, ${examStats.disconnected} disconnected`;
+
+    document.getElementById("infoViolations").innerText =
+        examStats.totalViolations;
+
+    document.getElementById("activeCandidatesCount").innerText =
+        examStats.activeCandidates;
+
+    document.getElementById("violationCount").innerText =
+        examStats.totalViolations;
+}
+
+function renderCandidates() {
+    const grid = document.getElementById("candidateGrid");
+    grid.innerHTML = "";
+
+    candidates.forEach(c => {
+        grid.innerHTML += `
+            <div class="candidate-card">
+                <div class="candidate-header">
+                    <div class="candidate-info">
+                        <div class="candidate-avatar">${c.regno[0]}</div>
+                        <div>
+                            <h4>${c.fullname}</h4>
+                            <p>${c.regno}</p>
+                        </div>
+                    </div>
+                    <span class="candidate-status ${c.is_online ? "status-active" : "status-offline"}">
+                        ${c.is_online ? "ACTIVE" : "OFFLINE"}
+                    </span>
+                </div>
+                <div class="candidate-metrics">
+                    <div class="metric">
+                        <div class="metric-value">${c.violations}</div>
+                        <div class="metric-label">Violations</div>
+                    </div>
+                </div>
+            </div>
+        `;
+    });
+}
+
+function renderAlerts() {
+    const list = document.getElementById("alertsList");
+    if (!list) return;
+
+    list.innerHTML = "";
+
+    alerts.forEach(a => {
+        list.innerHTML += `
+            <div class="alert-item">
+                <strong>${a.fullname}</strong> — ${a.warning_type}
+                <span class="severity ${a.severity}">
+                    ${a.severity.toUpperCase()}
+                </span>
+            </div>
+        `;
+    });
+}
+
+/* ===============================
+   INITIAL LOAD
+=============================== */
+document.addEventListener("DOMContentLoaded", () => {
+    fetchExamInfo();
+    fetchCandidates();
+    fetchStats();
+    fetchAlerts();
+});
+</script>
+
+
+</body>
+</html>

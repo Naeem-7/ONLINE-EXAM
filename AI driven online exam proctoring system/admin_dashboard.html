@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Dashboard - AI Exam Proctoring</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+    /* ========== STYLES REMAIN UNCHANGED ========== */
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Poppins", sans-serif;
+    }
+
+    body {
+        background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+        min-height: 100vh;
+        display: flex;
+        color: #333;
+    }
+
+    /* Sidebar */
+    .sidebar {
+        width: 280px;
+        height: 100vh;
+        background: linear-gradient(180deg, #2c3e50 0%, #1a2530 100%);
+        color: white;
+        padding-top: 30px;
+        position: fixed;
+        left: 0;
+        top: 0;
+        box-shadow: 4px 0 20px rgba(0, 0, 0, 0.1);
+        z-index: 100;
+    }
+
+    .sidebar-header {
+        text-align: center;
+        padding: 0 25px 30px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        margin-bottom: 20px;
+    }
+
+    .sidebar h2 {
+        font-size: 24px;
+        font-weight: 700;
+        background: linear-gradient(90deg, #4da8ff, #66ccff);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 5px;
+    }
+
+    .sidebar-subtitle {
+        font-size: 13px;
+        color: #a0aec0;
+        margin-top: 5px;
+    }
+
+    .sidebar a {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        padding: 16px 25px;
+        margin: 5px 15px;
+        font-size: 16px;
+        text-decoration: none;
+        color: #cbd5e0;
+        border-radius: 10px;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .sidebar a i {
+        width: 22px;
+        font-size: 18px;
+        text-align: center;
+    }
+
+    .sidebar a:hover {
+        background: rgba(255, 255, 255, 0.1);
+        color: white;
+        transform: translateX(5px);
+    }
+
+    .sidebar .active {
+        background: linear-gradient(90deg, rgba(77, 168, 255, 0.2), rgba(102, 204, 255, 0.1));
+        color: white;
+        border-left: 4px solid #4da8ff;
+    }
+
+    .sidebar .active::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 4px;
+        height: 100%;
+        background: #4da8ff;
+    }
+
+    /* Main Content */
+    .main {
+        margin-left: 280px;
+        padding: 40px;
+        width: calc(100% - 280px);
+        min-height: 100vh;
+    }
+
+    .title {
+        font-size: 32px;
+        color: #2d3748;
+        font-weight: 700;
+        margin-bottom: 30px;
+        position: relative;
+        display: inline-block;
+    }
+
+    .title::after {
+        content: '';
+        position: absolute;
+        bottom: -8px;
+        left: 0;
+        width: 60px;
+        height: 4px;
+        background: linear-gradient(90deg, #4da8ff, #66ccff);
+        border-radius: 2px;
+    }
+
+    /* Dashboard Cards */
+    .grid {
+        display: grid;
+        gap: 25px;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    }
+
+    .card {
+        background: white;
+        padding: 25px;
+        border-radius: 16px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        transition: all 0.3s ease;
+        border: 1px solid rgba(226, 232, 240, 0.8);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 4px;
+        background: linear-gradient(90deg, #4da8ff, #66ccff);
+    }
+
+    .card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 12px 25px rgba(0, 0, 0, 0.1);
+    }
+
+    .card h3 {
+        margin: 0 0 10px 0;
+        font-size: 18px;
+        color: #4a5568;
+        font-weight: 600;
+    }
+
+    .card p {
+        margin: 0;
+        font-size: 28px;
+        font-weight: 700;
+        color: #2d3748;
+    }
+
+    /* Quick Actions */
+    .actions-container {
+        margin-top: 50px;
+        background: white;
+        padding: 25px;
+        border-radius: 16px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        border: 1px solid rgba(226, 232, 240, 0.8);
+    }
+
+    .actions-title {
+        font-size: 24px;
+        color: #2d3748;
+        font-weight: 700;
+        margin-bottom: 20px;
+        position: relative;
+        display: inline-block;
+    }
+
+    .actions-title::after {
+        content: '';
+        position: absolute;
+        bottom: -6px;
+        left: 0;
+        width: 40px;
+        height: 3px;
+        background: linear-gradient(90deg, #4da8ff, #66ccff);
+        border-radius: 2px;
+    }
+
+    .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+
+    .actions a {
+        background: linear-gradient(90deg, #4da8ff, #66ccff);
+        padding: 14px 22px;
+        color: white;
+        border-radius: 10px;
+        font-size: 15px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(77, 168, 255, 0.3);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .actions a:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 18px rgba(77, 168, 255, 0.4);
+    }
+
+    /* Alerts */
+    .alerts {
+        background: white;
+        padding: 25px;
+        border-radius: 16px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        border: 1px solid rgba(226, 232, 240, 0.8);
+        margin-top: 40px;
+    }
+
+    .alerts h3 {
+        margin: 0 0 20px 0;
+        color: #e53e3e;
+        font-size: 24px;
+        font-weight: 700;
+        position: relative;
+        display: inline-block;
+    }
+
+    .alerts h3::after {
+        content: '';
+        position: absolute;
+        bottom: -6px;
+        left: 0;
+        width: 40px;
+        height: 3px;
+        background: #e53e3e;
+        border-radius: 2px;
+    }
+
+    .alert-box {
+        background: #fed7d7;
+        padding: 16px;
+        border-left: 4px solid #e53e3e;
+        border-radius: 8px;
+        color: #742a2a;
+        margin-top: 15px;
+        font-size: 16px;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        position: relative;
+        padding-right: 50px;
+    }
+
+    .alert-box:hover {
+        transform: translateX(5px);
+        background: #feb2b2;
+    }
+
+    .alert-box i {
+        color: #e53e3e;
+        font-size: 18px;
+    }
+
+    /* NEW: Alert Delete Button */
+    .alert-delete-btn {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        background: linear-gradient(90deg, #e53e3e, #f56565);
+        color: white;
+        border: none;
+        border-radius: 50%;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+        font-weight: 700;
+        box-shadow: 0 3px 8px rgba(229, 62, 62, 0.2);
+        width: 28px;
+        height: 28px;
+        padding: 0;
+    }
+
+    .alert-delete-btn:hover {
+        background: linear-gradient(90deg, #c53030, #e53e3e);
+        transform: scale(1.1);
+        box-shadow: 0 5px 12px rgba(229, 62, 62, 0.3);
+    }
+
+    .alert-delete-btn:active {
+        transform: scale(0.95);
+    }
+
+    /* Support Section Styles */
+    .support-container {
+        background: white;
+        padding: 25px;
+        border-radius: 16px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        border: 1px solid rgba(226, 232, 240, 0.8);
+        margin-top: 40px;
+    }
+
+    .support-container h2 {
+        margin: 0 0 20px 0;
+        color: #2d3748;
+        font-size: 24px;
+        font-weight: 700;
+        position: relative;
+        display: inline-block;
+    }
+
+    .support-container h2::after {
+        content: '';
+        position: absolute;
+        bottom: -6px;
+        left: 0;
+        width: 40px;
+        height: 3px;
+        background: linear-gradient(90deg, #4da8ff, #66ccff);
+        border-radius: 2px;
+    }
+
+    .support-request {
+        background: #f7fafc;
+        padding: 20px;
+        border-left: 4px solid #4da8ff;
+        border-radius: 10px;
+        margin-top: 15px;
+        transition: all 0.3s ease;
+        border: 1px solid #e2e8f0;
+        position: relative;
+        padding-right: 50px;
+    }
+
+    .support-request:hover {
+        transform: translateX(5px);
+        background: #edf2f7;
+    }
+
+    .support-title {
+        font-weight: 600;
+        color: #2d3748;
+        font-size: 18px;
+        margin-bottom: 10px;
+        padding-right: 50px;
+    }
+
+    .support-info {
+        display: flex;
+        gap: 20px;
+        font-size: 14px;
+        color: #4a5568;
+        margin-bottom: 12px;
+    }
+
+    .support-info span {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .support-message {
+        padding: 12px;
+        background: white;
+        border-radius: 8px;
+        border-left: 3px solid #cbd5e0;
+        font-size: 14px;
+        color: #4a5568;
+        line-height: 1.5;
+        margin-right: 40px;
+    }
+
+    /* Delete Button Styles */
+    .support-delete-btn {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        background: linear-gradient(90deg, #e53e3e, #f56565);
+        color: white;
+        border: none;
+        border-radius: 50%;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+        font-weight: 700;
+        box-shadow: 0 3px 8px rgba(229, 62, 62, 0.2);
+        width: 28px;
+        height: 28px;
+        padding: 0;
+    }
+
+    .support-delete-btn:hover {
+        background: linear-gradient(90deg, #c53030, #e53e3e);
+        transform: scale(1.1);
+        box-shadow: 0 5px 12px rgba(229, 62, 62, 0.3);
+    }
+
+    .support-delete-btn:active {
+        transform: scale(0.95);
+    }
+
+    /* Responsive Design */
+    @media (max-width: 1024px) {
+        .sidebar { width: 240px; }
+        .main { margin-left: 240px; width: calc(100% - 240px); }
+    }
+
+    @media (max-width: 768px) {
+        .sidebar { width: 70px; overflow: hidden; }
+        .sidebar-header h2, .sidebar-subtitle, .sidebar a span { display: none; }
+        .sidebar a { justify-content: center; padding: 20px; margin: 5px 10px; }
+        .main { margin-left: 70px; width: calc(100% - 70px); padding: 20px; }
+        .grid { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
+        .actions { flex-direction: column; }
+        .actions a { justify-content: center; }
+        .support-info { flex-direction: column; gap: 8px; }
+        .support-delete-btn, .alert-delete-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            width: 26px;
+            height: 26px;
+        }
+        .support-title {
+            padding-right: 40px;
+        }
+        .support-message {
+            margin-right: 30px;
+        }
+        .alert-box {
+            padding-right: 50px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .grid { grid-template-columns: 1fr; }
+        .main { padding: 15px; }
+        .title { font-size: 26px; }
+    }
+</style>
+</head>
+
+<body>
+
+<!-- Sidebar -->
+<div class="sidebar">
+    <div class="sidebar-header">
+        <h2>AI Exam Proctoring</h2>
+        <div class="sidebar-subtitle">Administrator Panel</div>
+    </div>
+
+    <a class="active" href="admin_dashboard.html">
+        <i class="fas fa-chart-line"></i> <span>Dashboard</span>
+    </a>
+
+    <a href="manage_exam.html">
+        <i class="fas fa-file-alt"></i> <span>Manage Exams</span>
+    </a>
+
+    <a href="ai_reports.html">
+        <i class="fas fa-robot"></i> <span>AI Reports</span>
+    </a>
+
+    <a href="javascript:void(0)" onclick="openLiveProctoring()">
+        <i class="fas fa-video"></i> <span>Live Proctoring</span>
+    </a>
+
+    <a href="#" id="logoutBtn">
+        <i class="fas fa-sign-out-alt"></i> <span>Logout</span>
+    </a>
+</div>
+
+<!-- Main Content -->
+<div class="main">
+
+    <div class="title">Dashboard Overview</div>
+
+    <div class="grid">
+        <div class="card"><h3>Active Exams</h3><p id="activeExams">0</p></div>
+        <div class="card"><h3>Students Online</h3><p id="studentsOnline">0</p></div>
+        <div class="card"><h3>AI Violations Today</h3><p id="aiViolations">0</p></div>
+        <div class="card"><h3>Total Students</h3><p id="totalStudents">0</p></div>
+        <div class="card"><h3>Total Exams</h3><p id="totalExams">0</p></div>
+    </div>
+
+    <div class="actions-container">
+        <div class="actions-title">Quick Actions</div>
+
+        <div class="actions">
+            <a href="create_newexam.html"><i class="fas fa-plus-circle"></i> Create New Exam</a>
+            <a href="upload_question.html"><i class="fas fa-upload"></i> Upload Questions</a>
+            <a href="admin_learning_resources.html"><i class="fas fa-book-open"></i> Learning Resources</a>
+
+            <a href="javascript:void(0)" onclick="openLiveProctoring()">
+                <i class="fas fa-eye"></i> Monitor Live Exam
+            </a>
+
+            <a href="ai_reports.html"><i class="fas fa-chart-bar"></i> View AI Reports</a>
+        </div>
+    </div>
+
+    <div class="alerts">
+        <h3>Recent AI Alerts</h3>
+        <div id="alertsContainer"></div>
+    </div>
+
+    <div class="support-container">
+        <h2>Support Requests</h2>
+        <div id="supportRequests"><p>Loading support requests...</p></div>
+    </div>
+</div>
+
+<script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+
+<script>
+/* =====================================================
+   ✅ FIXED FUNCTION – CORRECT examId PARAM
+===================================================== */
+async function openLiveProctoring() {
+    try {
+        const token = localStorage.getItem("adminToken");
+
+        const res = await fetch("http://localhost:3000/api/admin/live-exams", {
+            headers: { "Authorization": `Bearer ${token}` },
+            cache: "no-store"
+        });
+
+        const data = await res.json();
+
+        if (!data.success || !data.exams || data.exams.length === 0) {
+            alert("❌ No active exams available for live proctoring");
+            return;
+        }
+
+        const examId = data.exams[0].id;
+
+        /* ✅ ONLY FIX */
+        window.location.href = `admin_live_proctoring.html?examId=${examId}`;
+
+    } catch (err) {
+        console.error("Live proctoring error:", err);
+        alert("❌ Unable to open live proctoring");
+    }
+}
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", async () => {
+
+    const token = localStorage.getItem("adminToken");
+    if (!token) {
+        alert("You are not logged in!");
+        window.location.href = "admin_login.html";
+        return;
+    }
+
+    const headers = { 
+        "Authorization": `Bearer ${token}`,
+        "Content-Type": "application/json"
+    };
+
+    let aiViolationCount = 0;
+    let studentsOnlineCount = 0;
+
+    const socket = io("http://localhost:3000", {
+        auth: { token: `Bearer ${token}` }
+    });
+
+    socket.on("connect", () => {
+        socket.emit("admin_join");
+    });
+
+    async function fetchDashboard() {
+        const statsResponse = await fetch("http://localhost:3000/api/admins/stats", { headers });
+        const statsData = await statsResponse.json();
+
+        document.getElementById("activeExams").innerText = statsData.activeExams ?? 0;
+        document.getElementById("totalStudents").innerText = statsData.totalStudents ?? 0;
+        document.getElementById("totalExams").innerText = statsData.totalExams ?? 0;
+
+        if (studentsOnlineCount === 0 && statsData.onlineStudents !== undefined) {
+            studentsOnlineCount = statsData.onlineStudents;
+            document.getElementById("studentsOnline").innerText = studentsOnlineCount;
+        }
+    }
+
+    fetchDashboard();
+    setInterval(fetchDashboard, 5000);
+
+    document.getElementById("logoutBtn").addEventListener("click", () => {
+        localStorage.removeItem("adminToken");
+        window.location.href = "admin_login.html";
+    });
+
+});
+</script>
+
+</body>
+</html>

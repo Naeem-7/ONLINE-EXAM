@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Learning Resources - AI Exam Proctoring</title>
+
+<!-- Font Awesome Icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Poppins", sans-serif;
+    }
+
+    body {
+        background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+        min-height: 100vh;
+        color: #333;
+        padding: 40px;
+    }
+
+    .title {
+        font-size: 32px;
+        color: #2d3748;
+        font-weight: 700;
+        margin-bottom: 30px;
+        position: relative;
+        display: inline-block;
+    }
+
+    .title::after {
+        content: '';
+        position: absolute;
+        bottom: -8px;
+        left: 0;
+        width: 60px;
+        height: 4px;
+        background: linear-gradient(90deg, #4da8ff, #66ccff);
+        border-radius: 2px;
+    }
+
+    /* Upload Container */
+    .upload-container {
+        background: white;
+        padding: 40px;
+        border-radius: 16px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+        border: 1px solid rgba(226, 232, 240, 0.8);
+        max-width: 800px;
+        margin: 0 auto;
+    }
+
+    .upload-container h2 {
+        font-size: 28px;
+        color: #2d3748;
+        font-weight: 700;
+        margin-bottom: 10px;
+        text-align: center;
+    }
+
+    .upload-container h3 {
+        font-size: 20px;
+        color: #4a5568;
+        font-weight: 600;
+        margin-bottom: 30px;
+        text-align: center;
+    }
+
+    .upload-info {
+        background: #f8fafc;
+        padding: 20px;
+        border-radius: 12px;
+        margin-bottom: 30px;
+        border-left: 4px solid #4da8ff;
+    }
+
+    .upload-info p {
+        margin: 8px 0;
+        color: #4a5568;
+        font-size: 16px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .upload-info p i {
+        color: #4da8ff;
+        font-size: 16px;
+        width: 20px;
+    }
+
+    .divider {
+        height: 1px;
+        background: linear-gradient(90deg, transparent, #e2e8f0, transparent);
+        margin: 30px 0;
+    }
+
+    /* Upload Area */
+    .upload-area {
+        border: 3px dashed #cbd5e0;
+        border-radius: 16px;
+        padding: 60px 40px;
+        text-align: center;
+        background: #f8fafc;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-bottom: 30px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .upload-area:hover {
+        border-color: #4da8ff;
+        background: #edf7ff;
+        transform: translateY(-5px);
+    }
+
+    .upload-area i {
+        font-size: 64px;
+        color: #4da8ff;
+        margin-bottom: 20px;
+        display: block;
+    }
+
+    .upload-area h4 {
+        font-size: 22px;
+        color: #2d3748;
+        margin-bottom: 15px;
+        font-weight: 600;
+    }
+
+    .upload-area p {
+        color: #718096;
+        font-size: 16px;
+        margin-bottom: 25px;
+    }
+
+    .upload-btn {
+        background: linear-gradient(90deg, #4da8ff, #66ccff);
+        color: white;
+        border: none;
+        padding: 14px 32px;
+        font-size: 16px;
+        font-weight: 600;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(77, 168, 255, 0.3);
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .upload-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(77, 168, 255, 0.4);
+    }
+
+    .upload-btn:active {
+        transform: translateY(-1px);
+    }
+
+    /* Uploaded Resources */
+    .resources-list {
+        margin-top: 50px;
+        background: white;
+        padding: 30px;
+        border-radius: 16px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        border: 1px solid rgba(226, 232, 240, 0.8);
+        max-width: 800px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .resources-list h3 {
+        font-size: 24px;
+        color: #2d3748;
+        font-weight: 700;
+        margin-bottom: 25px;
+        position: relative;
+        display: inline-block;
+    }
+
+    .resources-list h3::after {
+        content: '';
+        position: absolute;
+        bottom: -6px;
+        left: 0;
+        width: 40px;
+        height: 3px;
+        background: linear-gradient(90deg, #4da8ff, #66ccff);
+        border-radius: 2px;
+    }
+
+    .resource-item {
+        display: flex;
+        align-items: center;
+        padding: 20px;
+        background: #f8fafc;
+        border-radius: 12px;
+        margin-bottom: 15px;
+        border-left: 4px solid #4da8ff;
+        transition: all 0.3s ease;
+    }
+
+    .resource-item:hover {
+        transform: translateX(5px);
+        background: #edf7ff;
+    }
+
+    .resource-icon {
+        width: 50px;
+        height: 50px;
+        background: linear-gradient(135deg, #4da8ff, #66ccff);
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 20px;
+        flex-shrink: 0;
+    }
+
+    .resource-icon i {
+        font-size: 22px;
+        color: white;
+    }
+
+    .resource-details {
+        flex: 1;
+    }
+
+    .resource-details h4 {
+        font-size: 18px;
+        color: #2d3748;
+        margin-bottom: 5px;
+        font-weight: 600;
+    }
+
+    .resource-details p {
+        color: #718096;
+        font-size: 14px;
+        margin-bottom: 8px;
+    }
+
+    .resource-size {
+        font-size: 13px;
+        color: #a0aec0;
+    }
+
+    .resource-actions {
+        display: flex;
+        gap: 10px;
+    }
+
+    .resource-action-btn {
+        padding: 8px 16px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        border: none;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .view-btn {
+        background: #48bb78;
+        color: white;
+    }
+
+    .download-btn {
+        background: #4da8ff;
+        color: white;
+    }
+
+    .delete-btn {
+        background: #f56565;
+        color: white;
+    }
+
+    .resource-action-btn:hover {
+        transform: translateY(-2px);
+    }
+
+    .view-btn:hover {
+        background: #38a169;
+    }
+
+    .download-btn:hover {
+        background: #3182ce;
+    }
+
+    .delete-btn:hover {
+        background: #e53e3e;
+    }
+
+    /* Loading Spinner */
+    .spinner {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border: 3px solid rgba(255,255,255,.3);
+        border-radius: 50%;
+        border-top-color: #fff;
+        animation: spin 1s ease-in-out infinite;
+        margin-right: 8px;
+    }
+
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        body {
+            padding: 20px;
+        }
+        
+        .upload-container {
+            padding: 25px;
+        }
+        
+        .upload-area {
+            padding: 40px 20px;
+        }
+        
+        .resource-item {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        
+        .resource-icon {
+            margin-bottom: 15px;
+        }
+        
+        .resource-actions {
+            margin-top: 15px;
+            width: 100%;
+            justify-content: flex-start;
+        }
+    }
+
+    @media (max-width: 480px) {
+        body {
+            padding: 15px;
+        }
+        
+        .title {
+            font-size: 26px;
+        }
+        
+        .upload-container h2 {
+            font-size: 24px;
+        }
+        
+        .upload-container h3 {
+            font-size: 18px;
+        }
+        
+        .upload-area h4 {
+            font-size: 18px;
+        }
+        
+        .upload-area p {
+            font-size: 14px;
+        }
+        
+        .resource-actions {
+            flex-wrap: wrap;
+        }
+    }
+</style>
+</head>
+
+<body>
+
+<!-- Main Content -->
+<div class="main">
+
+    <div class="title">Learning Resources</div>
+
+    <!-- Upload Container -->
+    <div class="upload-container">
+        <h2>Upload Learning Resources</h2>
+        <h3>Upload Educational Materials (Bulk Upload)</h3>
+
+        <div class="upload-info">
+            <p><i class="fas fa-check-circle"></i> <strong>Supported format:</strong> DOC</p>
+            <p><i class="fas fa-check-circle"></i> <strong>Max file size:</strong> 50MB per file</p>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- Upload Area -->
+        <div class="upload-area" id="uploadArea">
+            <i class="fas fa-cloud-upload-alt"></i>
+            <h4>Drag & Drop files here</h4>
+            <p>or click below to choose a file</p>
+            <button class="upload-btn" id="uploadBtn">
+                <i class="fas fa-upload"></i> Upload File
+            </button>
+            <input type="file" id="fileInput" style="display: none;">
+        </div>
+    </div>
+
+    <!-- Uploaded Resources -->
+    <div class="resources-list" id="resourcesList">
+        <h3>Uploaded Resources</h3>
+        <div id="uploadedResourcesContainer">
+            <!-- Resources will be dynamically added here -->
+        </div>
+    </div>
+
+</div>
+<script>
+let uploadedResources = [];
+let isUploading = false;
+
+document.addEventListener('DOMContentLoaded', function () {
+    loadResourcesFromDatabase();
+    initializeEventListeners();
+});
+
+function initializeEventListeners() {
+    const uploadArea = document.getElementById('uploadArea');
+    const uploadBtn = document.getElementById('uploadBtn');
+    const fileInput = document.getElementById('fileInput');
+
+    uploadArea.addEventListener('click', () => {
+        if (!isUploading) fileInput.click();
+    });
+
+    uploadBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (!isUploading) fileInput.click();
+    });
+
+    fileInput.addEventListener('change', e => {
+        if (e.target.files.length > 0) {
+            setTimeout(() => {
+                handleFileUpload(e.target.files[0]);
+            }, 0);
+        }
+    });
+
+    uploadArea.addEventListener('dragover', e => {
+        e.preventDefault();
+        uploadArea.style.borderColor = '#4da8ff';
+    });
+
+    uploadArea.addEventListener('drop', e => {
+        e.preventDefault();
+        uploadArea.style.borderColor = '#cbd5e0';
+        if (e.dataTransfer.files.length > 0) {
+            handleFileUpload(e.dataTransfer.files[0]);
+        }
+    });
+}
+
+/* 🔥 HANDLE FILE UPLOAD */
+async function handleFileUpload(file) {
+    if (isUploading) return;
+    isUploading = true;
+
+    const token = localStorage.getItem("adminToken");
+    if (!token) {
+        alert("Admin not logged in");
+        isUploading = false;
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("title", file.name);
+    formData.append("description", "Admin learning resource");
+
+    try {
+        const res = await fetch("http://localhost:3000/api/learning-resources", {
+            method: "POST",
+            headers: {
+                "Authorization": `Bearer ${token}`
+            },
+            body: formData
+        });
+
+        const contentType = res.headers.get("content-type");
+        if (!contentType || !contentType.includes("application/json")) {
+            const text = await res.text();
+            console.error("Invalid JSON response:", text);
+            throw new Error("Server returned invalid response");
+        }
+
+        const data = await res.json();
+        if (!res.ok) throw data;
+
+        showNotification("File uploaded successfully", "success");
+
+        uploadedResources.unshift(data.resource);
+        displayAllResources();
+
+    } catch (err) {
+        console.error(err);
+        alert(err.message || "Upload failed");
+    } finally {
+        isUploading = false;
+        document.getElementById("fileInput").value = "";
+    }
+}
+
+/* 🔥 LOAD RESOURCES FROM BACKEND */
+async function loadResourcesFromDatabase() {
+    try {
+        const res = await fetch("http://localhost:3000/api/learning-resources", {
+            cache: "no-store"
+        });
+
+        if (!res.ok) {
+            throw new Error("HTTP error " + res.status);
+        }
+
+        const contentType = res.headers.get("content-type");
+        if (!contentType || !contentType.includes("application/json")) {
+            const text = await res.text();
+            console.error("Invalid JSON response:", text);
+            throw new Error("Invalid server response");
+        }
+
+        const data = await res.json();
+        uploadedResources = data.resources || [];
+        displayAllResources();
+
+    } catch (err) {
+        console.error("Failed to load resources:", err);
+    }
+}
+
+function displayAllResources() {
+    const container = document.getElementById('uploadedResourcesContainer');
+    container.innerHTML = "";
+    uploadedResources.forEach(resource => addResourceToDisplay(resource));
+}
+
+function addResourceToDisplay(resource) {
+    const container = document.getElementById('uploadedResourcesContainer');
+
+    const div = document.createElement("div");
+    div.className = "resource-item";
+
+    div.innerHTML = `
+        <div class="resource-icon">
+            <i class="fas fa-file-word"></i>
+        </div>
+        <div class="resource-details">
+            <h4>${resource.title}</h4>
+            <p>${resource.description || ""}</p>
+            <p class="resource-size">
+                Size: ${(resource.file_size / 1024).toFixed(2)} KB • 
+                Uploaded: ${new Date(resource.uploaded_at).toLocaleString()}
+            </p>
+        </div>
+        <div class="resource-actions">
+            <button onclick="downloadResource('${resource.file_path}')">
+                <i class="fas fa-download"></i> Download
+            </button>
+            <button onclick="deleteResource(${resource.id})">
+                <i class="fas fa-trash"></i> Delete
+            </button>
+        </div>
+    `;
+
+    container.appendChild(div);
+}
+
+/* 🔥 SAFE DOWNLOAD */
+function downloadResource(filePath) {
+    const cleanPath = filePath.replace(/\\/g, "/");
+    window.open(`http://localhost:3000/${cleanPath}`, "_blank");
+}
+
+/* 🔥 SAFE DELETE */
+async function deleteResource(id) {
+    const token = localStorage.getItem("adminToken");
+    if (!confirm("Are you sure you want to delete this resource?")) return;
+
+    try {
+        const res = await fetch(`http://localhost:3000/api/learning-resources/${id}`, {
+            method: "DELETE",
+            headers: { "Authorization": `Bearer ${token}` }
+        });
+
+        const data = await res.json();
+        if (!res.ok) throw data;
+
+        showNotification("Resource deleted successfully", "success");
+
+        uploadedResources = uploadedResources.filter(r => r.id !== id);
+        displayAllResources();
+
+    } catch (err) {
+        console.error("Delete error:", err);
+        alert(err.message || "Failed to delete resource");
+    }
+}
+
+function showNotification(msg, type) {
+    alert(msg);
+}
+</script>
+
+
+
+
+
+
+
+
+</body>
+</html>

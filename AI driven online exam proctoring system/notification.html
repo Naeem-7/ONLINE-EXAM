@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Student Notifications</title>
+
+<style>
+    body {
+        margin: 0;
+        background: #f4f6fa;
+        font-family: "Poppins", sans-serif;
+    }
+
+    .container {
+        width: 90%;
+        max-width: 850px;
+        margin: 30px auto;
+        background: white;
+        padding: 25px;
+        border-radius: 12px;
+        border: 1.5px solid #d4dce4;
+    }
+
+    h2 {
+        text-align: center;
+        color: #12365b;
+        font-size: 26px;
+        margin-bottom: 25px;
+        font-weight: 700;
+    }
+
+    .notification {
+        background: #fff;
+        padding: 18px;
+        border-radius: 10px;
+        border: 1px solid #d9e2ec;
+        margin-bottom: 15px;
+        transition: 0.3s;
+        position: relative;
+    }
+
+    .notification:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    .title {
+        font-size: 18px;
+        color: #12365b;
+        font-weight: bold;
+        margin-bottom: 6px;
+    }
+
+    .message {
+        font-size: 15px;
+        color: #444;
+        margin-bottom: 8px;
+    }
+
+    .time {
+        font-size: 13px;
+        color: #666;
+    }
+
+    .unread {
+        border-left: 4px solid #1d6ef7;
+        background: #eef4ff;
+    }
+
+    .tag {
+        padding: 4px 10px;
+        font-size: 12px;
+        font-weight: bold;
+        border-radius: 50px;
+        color: white;
+        margin-right: 6px;
+    }
+
+    .exam { background: #3a86ff; }
+    .alert { background: #ef233c; }
+    .info { background: #2a9d8f; }
+</style>
+</head>
+
+<body>
+
+<div class="container">
+    <h2>Notifications</h2>
+
+    <!-- Notification 1 -->
+    <div class="notification unread">
+        <span class="tag exam">EXAM</span>
+        <div class="title">Your Final Test Starts Tomorrow</div>
+        <div class="message">Be ready by 10:00 AM. Keep your webcam and microphone active.</div>
+        <div class="time">2 hours ago</div>
+    </div>
+
+    <!-- Notification 2 -->
+    <div class="notification unread">
+        <span class="tag alert">IMPORTANT</span>
+        <div class="title">Face Not Detected During Mock Test</div>
+        <div class="message">Make sure your camera is working properly before the real exam.</div>
+        <div class="time">5 hours ago</div>
+    </div>
+
+    <!-- Notification 3 -->
+    <div class="notification">
+        <span class="tag info">INFO</span>
+        <div class="title">New Study Materials Added</div>
+        <div class="message">10 additional PDFs were uploaded in Learning Resources.</div>
+        <div class="time">Yesterday</div>
+    </div>
+
+    <!-- Notification 4 -->
+    <div class="notification">
+        <span class="tag exam">REMINDER</span>
+        <div class="title">Practice Test Available</div>
+        <div class="message">Try the practice test to understand proctoring rules.</div>
+        <div class="time">Yesterday</div>
+    </div>
+
+    <!-- Notification 5 -->
+    <div class="notification">
+        <span class="tag info">NOTE</span>
+        <div class="title">Profile Update Successful</div>
+        <div class="message">Your recent profile changes have been saved.</div>
+        <div class="time">2 days ago</div>
+    </div>
+
+    <!-- Notification 6 -->
+    <div class="notification">
+        <span class="tag exam">EXAM</span>
+        <div class="title">Results Released</div>
+        <div class="message">Your last exam result is available under the Results section.</div>
+        <div class="time">3 days ago</div>
+    </div>
+
+</div>
+
+</body>
+</html>

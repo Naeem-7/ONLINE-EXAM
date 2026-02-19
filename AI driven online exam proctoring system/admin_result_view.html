@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin View - Student Result</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; padding: 20px; background: #f5f7fa; }
+        .result-card { max-width: 800px; margin: 0 auto; background: #fff; padding: 25px; border-radius: 12px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); }
+        h2 { text-align: center; color: #1e3c72; }
+        .student-info { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+        .student-info p { margin: 0; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #1e3c72; padding: 10px; text-align: left; }
+        th { background: #1e3c72; color: #fff; }
+        tbody tr:nth-child(even) { background: #f0f7ff; }
+    </style>
+</head>
+<body>
+
+<div class="result-card">
+    <h2>Student Result (Admin View)</h2>
+
+    <div class="student-info">
+        <p><strong>Name:</strong> <span id="studentName"></span></p>
+        <p><strong>Register Number:</strong> <span id="registerNumber"></span></p>
+        <p><strong>Class:</strong> <span id="studentClass"></span></p>
+        <p><strong>Department:</strong> <span id="department"></span></p>
+        <p><strong>Subject:</strong> <span id="subject"></span></p>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Category</th>
+                <th>Value</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr><td>Total Questions</td><td id="totalQuestions"></td></tr>
+            <tr><td>Correct</td><td id="correct"></td></tr>
+            <tr><td>Wrong</td><td id="wrong"></td></tr>
+            <tr><td>Total Marks</td><td id="totalMarks"></td></tr>
+            <tr><td>Integrity Percent</td><td id="integrity"></td></tr>
+            <tr><td>Score Percent</td><td id="scorePercent"></td></tr>
+        </tbody>
+    </table>
+</div>
+
+<script>
+    function getQueryParams() {
+        const params = {};
+        location.search.substring(1).split("&").forEach(pair => {
+            if (!pair) return;
+            const [key, value] = pair.split("=");
+            params[decodeURIComponent(key)] = decodeURIComponent(value || "");
+        });
+        return params;
+    }
+
+    document.addEventListener("DOMContentLoaded", async () => {
+        const params = getQueryParams();
+
+        const studentId = params.student_id || params.regno;
+        const examId = params.exam_id || params.examId;
+
+        if (!studentId || !examId) {
+            alert("Missing student ID or exam ID");
+            return;
+        }
+
+        try {
+            const res = await fetch(
+                `http://localhost:3000/api/results/admin?student_id=${encodeURIComponent(studentId)}&exam_id=${encodeURIComponent(examId)}`
+            );
+
+            const data = await res.json();
+
+            if (!data.success || !Array.isArray(data.data) || data.data.length === 0) {
+                alert("Result not found");
+                return;
+            }
+
+            const r = data.data[0];
+
+            // ---------- STUDENT INFO ----------
+            document.getElementById("studentName").innerText = r.student_name;
+            document.getElementById("registerNumber").innerText = r.regno;
+            document.getElementById("studentClass").innerText = r.class;
+            document.getElementById("department").innerText = r.department;
+            document.getElementById("subject").innerText = r.exam_name;
+
+            // ---------- RESULT INFO (REAL DATA) ----------
+            const totalQuestions = r.total_questions ?? 0;
+            const correct = r.score ?? 0;
+            const wrong = r.wrong ?? (totalQuestions - correct);
+            const scorePercent =
+                r.score_percent ??
+                (totalQuestions > 0
+                    ? ((correct / totalQuestions) * 100).toFixed(2)
+                    : 0);
+
+            document.getElementById("totalQuestions").innerText = totalQuestions;
+            document.getElementById("correct").innerText = correct;
+            document.getElementById("wrong").innerText = wrong;
+            document.getElementById("totalMarks").innerText = `${correct} / ${totalQuestions}`;
+            document.getElementById("integrity").innerText = r.integrity_percent + "%";
+            document.getElementById("scorePercent").innerText = scorePercent + "%";
+
+        } catch (err) {
+            console.error(err);
+            alert("Error fetching result from database");
+        }
+    });
+</script>
+
+
+
+
+</body>
+</html>

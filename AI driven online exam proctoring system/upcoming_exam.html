@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upcoming Exams</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Poppins", sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            color: #333;
+            overflow-x: hidden;
+        }
+
+        /* Animated Background */
+        .background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .floating-shapes {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+
+        .shape {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.4);
+            animation: float 20s infinite ease-in-out;
+        }
+
+        .shape:nth-child(1) {
+            width: 80px;
+            height: 80px;
+            top: 10%;
+            left: 10%;
+            animation-delay: 0s;
+            background: rgba(74, 144, 226, 0.2);
+        }
+
+        .shape:nth-child(2) {
+            width: 120px;
+            height: 120px;
+            top: 70%;
+            left: 80%;
+            animation-delay: 5s;
+            background: rgba(45, 64, 89, 0.1);
+        }
+
+        .shape:nth-child(3) {
+            width: 60px;
+            height: 60px;
+            top: 40%;
+            left: 85%;
+            animation-delay: 10s;
+            background: rgba(74, 144, 226, 0.15);
+        }
+
+        .shape:nth-child(4) {
+            width: 100px;
+            height: 100px;
+            top: 80%;
+            left: 15%;
+            animation-delay: 15s;
+            background: rgba(45, 64, 89, 0.1);
+        }
+
+        .shape:nth-child(5) {
+            width: 70px;
+            height: 70px;
+            top: 15%;
+            left: 75%;
+            animation-delay: 20s;
+            background: rgba(74, 144, 226, 0.2);
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0) translateX(0) rotate(0deg);
+            }
+            25% {
+                transform: translateY(-20px) translateX(10px) rotate(5deg);
+            }
+            50% {
+                transform: translateY(10px) translateX(-10px) rotate(-5deg);
+            }
+            75% {
+                transform: translateY(-10px) translateX(-5px) rotate(3deg);
+            }
+        }
+
+        header {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            padding: 25px;
+            text-align: center;
+            color: #2d4059;
+            font-size: 28px;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            position: relative;
+            z-index: 1;
+            font-weight: 600;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 850px;
+            margin: 40px auto;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 25px;
+        }
+
+        .exam-card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(10px);
+            padding: 25px;
+            border-radius: 16px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+            transition: 0.3s ease;
+            border-left: 6px solid #4a90e2;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .exam-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+            transition: 0.5s;
+        }
+
+        .exam-card:hover::before {
+            left: 100%;
+        }
+
+        .exam-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.12);
+        }
+
+        .title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #2d4059;
+            margin-bottom: 15px;
+        }
+
+        .info {
+            font-size: 15px;
+            color: #555;
+            margin: 8px 0;
+        }
+
+        .btn {
+            margin-top: 15px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: #2d4059;
+            color: white;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 14px;
+            transition: 0.3s;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .btn:hover {
+            background: #1c293b;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .countdown {
+            font-weight: 600;
+            color: #2d4059;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+
+        /* Modal */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.6);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+        }
+
+        .modal-content {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            width: 90%;
+            max-width: 650px;
+            padding: 30px;
+            border-radius: 16px;
+            animation: zoom 0.25s ease;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+
+        @keyframes zoom {
+            from { transform: scale(0.7); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .close-btn {
+            float: right;
+            font-size: 24px;
+            cursor: pointer;
+            color: #777;
+            transition: 0.3s;
+        }
+
+        .close-btn:hover {
+            color: #2d4059;
+            transform: scale(1.1);
+        }
+
+        .modal-title {
+            font-size: 22px;
+            font-weight: 600;
+            color: #2d4059;
+            margin-bottom: 20px;
+        }
+
+        .modal-section {
+            margin-bottom: 20px;
+            font-size: 15px;
+            color: #444;
+            line-height: 1.5;
+        }
+
+        .modal-section b {
+            color: #2d4059;
+            display: block;
+            margin-bottom: 8px;
+            font-size: 16px;
+        }
+
+        .instructions-list {
+            list-style-type: none;
+            padding-left: 5px;
+        }
+
+        .instructions-list li {
+            padding: 8px 0;
+        }
+
+        .instructions-list li:before {
+            content: "•";
+            color: #4a90e2;
+            font-weight: bold;
+            font-size: 18px;
+            margin-right: 8px;
+        }
+
+        @media (max-width: 768px) {
+            header {
+                font-size: 24px;
+                padding: 20px;
+            }
+            
+            .container {
+                width: 95%;
+                margin: 25px auto;
+            }
+            
+            .exam-card {
+                padding: 20px;
+            }
+            
+            .title {
+                font-size: 18px;
+            }
+            
+            .modal-content {
+                padding: 25px;
+                max-height: 90vh;
+            }
+        }
+
+        @media (max-width: 480px) {
+            header {
+                font-size: 22px;
+            }
+            
+            .exam-card {
+                padding: 18px;
+            }
+            
+            .title {
+                font-size: 17px;
+            }
+            
+            .info {
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Animated Background -->
+    <div class="background">
+        <div class="floating-shapes">
+            <div class="shape"></div>
+            <div class="shape"></div>
+            <div class="shape"></div>
+            <div class="shape"></div>
+            <div class="shape"></div>
+        </div>
+    </div>
+
+    <header>Upcoming Exams</header>
+
+    <div class="container">
+
+        <!-- 12+ Exams -->
+        <div class="exam-card">
+            <div class="title">
+                Computer Networks
+            </div>
+            <div class="info">
+                Date: 12 Jan 2026
+            </div>
+            <div class="info">
+                Time: 10:00 AM
+            </div>
+            <div class="info">
+                Mode: Online
+            </div>
+        </div>
+
+        <div class="exam-card">
+            <div class="title">
+                Operating Systems
+            </div>
+            <div class="info">
+                Date: 15 Jan 2026
+            </div>
+            <div class="info">
+                Time: 09:30 AM
+            </div>
+            <div class="info">
+                Mode: Online
+            </div>
+        </div>
+
+        <div class="exam-card">
+            <div class="title">
+                DBMS
+            </div>
+            <div class="info">
+                Date: 18 Jan 2026
+            </div>
+            <div class="info">
+                Time: 11:00 AM
+            </div>
+            <div class="info">
+                Mode: Online
+            </div>
+        </div>
+
+        <div class="exam-card">
+            <div class="title">
+                Artificial Intelligence
+            </div>
+            <div class="info">
+                Date: 22 Jan 2026
+            </div>
+            <div class="info">
+                Time: 02:00 PM
+            </div>
+            <div class="info">
+                Mode: Online
+            </div>
+        </div>
+
+        <div class="exam-card">
+            <div class="title">
+                Web Technology
+            </div>
+            <div class="info">
+                Date: 24 Jan 2026
+            </div>
+            <div class="info">
+                Time: 09:00 AM
+            </div>
+            <div class="info">
+                Mode: Online
+            </div>
+        </div>
+
+        <div class="exam-card">
+            <div class="title">
+                Java Programming
+            </div>
+            <div class="info">
+                Date: 27 Jan 2026
+            </div>
+            <div class="info">
+                Time: 12:00 PM
+            </div>
+            <div class="info">
+                Mode: Online
+            </div>
+        </div>
+
+        <div class="exam-card">
+            <div class="title">
+                Software Engineering
+            </div>
+            <div class="info">
+                Date: 29 Jan 2026
+            </div>
+            <div class="info">
+                Time: 01:30 PM
+            </div>
+            <div class="info">
+                Mode: Online
+            </div>
+        </div>
+
+        <div class="exam-card">
+            <div class="title">
+                Cloud Computing
+            </div>
+            <div class="info">
+                Date: 01 Feb 2026
+            </div>
+            <div class="info">
+                Time: 10:30 AM
+            </div>
+            <div class="info">
+                Mode: Online
+            </div>
+        </div>
+
+        <div class="exam-card">
+            <div class="title">
+                Cyber Security
+            </div>
+            <div class="info">
+                Date: 04 Feb 2026
+            </div>
+            <div class="info">
+                Time: 11:30 AM
+            </div>
+            <div class="info">
+                Mode: Online
+            </div>
+        </div>
+
+        <div class="exam-card">
+            <div class="title">
+                Machine Learning
+            </div>
+            <div class="info">
+                Date: 07 Feb 2026
+            </div>
+            <div class="info">
+                Time: 09:30 AM
+            </div>
+            <div class="info">
+                Mode: Online
+            </div>
+        </div>
+
+        <div class="exam-card">
+            <div class="title">
+                Data Science
+            </div>
+            <div class="info">
+                Date: 10 Feb 2026
+            </div>
+            <div class="info">
+                Time: 02:00 PM
+            </div>
+            <div class="info">
+                Mode: Online
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Modal Section -->
+    <div class="modal" id="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal()">&times;</span>
+
+            <div class="modal-title">
+                <span id="modalTitle"></span>
+            </div>
+
+            <div class="modal-section">
+                <b>Exam Pattern:</b>
+                100 MCQs<br>
+                Each question: 1 mark<br>
+                No negative marking<br>
+                Duration: 2 hours
+            </div>
+
+            <div class="modal-section">
+                <b>Syllabus (Brief):</b>
+                <div id="syllabusText"></div>
+            </div>
+
+            <div class="modal-section">
+                <b>Important Instructions:</b>
+                <ul class="instructions-list">
+                    <li>Ensure you have a stable internet connection before starting the exam</li>
+                    <li>Use a laptop or desktop computer - mobile devices are not supported</li>
+                    <li>Keep your student ID card ready for verification</li>
+                    <li>The exam will be proctored - enable your webcam and microphone</li>
+                    <li>Close all other applications and browser tabs before starting</li>
+                    <li>You cannot pause the exam once started</li>
+                    <li>Answers are auto-saved, but submit before time expires</li>
+                    <li>In case of technical issues, contact support immediately</li>
+                    <li>Use of unauthorized materials will result in disqualification</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+<script>
+    // ----------------------
+    // GET STUDENT ID SAFELY (FIXED)
+    // ----------------------
+    const student_id =
+        localStorage.getItem("regno") ||
+        localStorage.getItem("student_id") ||
+        localStorage.getItem("studentId") ||
+        localStorage.getItem("user_id");
+
+    const token = localStorage.getItem("studentToken");
+
+    if (!student_id || !token) {
+        alert("Please login first");
+        window.location.href = "login.html";
+    }
+
+    // ----------------------
+    // FETCH UPCOMING EXAMS AND DISPLAY (FIXED)
+    // ----------------------
+    async function loadUpcomingExams() {
+        try {
+            const res = await fetch(
+                `http://localhost:3000/api/exams/upcoming?student_id=${student_id}`,
+                {
+                    headers: {
+                        "Authorization": `Bearer ${token}`
+                    }
+                }
+            );
+
+            const data = await res.json();
+
+            if (!data.success) {
+                console.error("Failed to load exams:", data.message);
+                return;
+            }
+
+            const exams = data.exams;
+            const container = document.querySelector('.container');
+            container.innerHTML = '';
+
+            // ✅ NORMALIZE TODAY
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            exams.forEach(exam => {
+
+                // ✅ NORMALIZE EXAM DATE (CRITICAL FIX)
+                const examDate = new Date(exam.exam_date);
+                examDate.setHours(0, 0, 0, 0);
+
+                // ✅ SAFETY CHECK (shows exams created today also)
+                if (examDate < today) return;
+
+                const examCard = document.createElement('div');
+                examCard.classList.add('exam-card');
+
+                examCard.innerHTML = `
+                    <div class="title">
+                        ${exam.exam_title}
+                    </div>
+                    <div class="info">
+                        Date: ${examDate.toLocaleDateString()}
+                    </div>
+                    <div class="info">
+                        Time: ${exam.start_time}
+                    </div>
+                    <div class="info">
+                        Mode: Online
+                    </div>
+
+                    <button class="btn start-exam-btn">Start Exam</button>
+                `;
+
+                // ----------------------
+                // START EXAM (UNCHANGED)
+                // ----------------------
+                examCard.querySelector(".start-exam-btn").onclick = () => {
+                    localStorage.setItem("exam_title", exam.exam_title);
+                    window.location.href = `proctored_test.html?exam_id=${exam.id}`;
+                };
+
+                container.appendChild(examCard);
+            });
+
+        } catch (err) {
+            console.error('Error fetching exams:', err);
+        }
+    }
+
+    // ----------------------
+    // OPEN MODAL WITH DYNAMIC SYLLABUS/DESCRIPTION
+    // ----------------------
+    function openModal(subject, syllabusText) {
+        document.getElementById("modalTitle").innerText = subject;
+        document.getElementById("syllabusText").innerText =
+            syllabusText || "Syllabus not available.";
+        document.getElementById("modal").style.display = "flex";
+    }
+
+    function closeModal() {
+        document.getElementById("modal").style.display = "none";
+    }
+
+    window.onclick = function(event) {
+        const modal = document.getElementById('modal');
+        if (event.target === modal) {
+            closeModal();
+        }
+    }
+
+    // ----------------------
+    // INITIAL LOAD
+    // ----------------------
+    loadUpcomingExams();
+</script>
+
+
+
+
+
+</body> 
+</html>

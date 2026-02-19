@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Learning Resources</title>
+
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+        background: #ffffff;
+        min-height: 100vh;
+        overflow-x: hidden;
+    }
+
+    .header {
+        background: linear-gradient(135deg, #4f46e5, #7c3aed);
+        padding: 22px 25px;
+        color: white;
+        font-size: 28px;
+        font-weight: 700;
+        box-shadow: 0 4px 20px rgba(79, 70, 229, 0.3);
+    }
+
+    .container {
+        width: 90%;
+        max-width: 1200px;
+        margin: 30px auto;
+    }
+
+    .search-filter-box {
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        margin-bottom: 30px;
+        gap: 15px;
+        background: #f8fafc;
+        padding: 20px;
+        border-radius: 16px;
+        border: 1px solid #e2e8f0;
+    }
+
+    .search-box input,
+    .filter-box select {
+        padding: 14px 18px;
+        border-radius: 12px;
+        border: 1px solid #cbd5e1;
+        font-size: 16px;
+        background: #ffffff;
+    }
+
+    .resources-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 25px;
+    }
+
+    .resource-card {
+        background: #ffffff;
+        padding: 22px;
+        border-radius: 16px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        transition: all 0.3s ease;
+        border: 1px solid #e2e8f0;
+        position: relative;
+    }
+
+    .resource-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 5px;
+        background: linear-gradient(90deg, #4f46e5, #7c3aed);
+    }
+
+    .resource-card:hover {
+        transform: translateY(-6px);
+    }
+
+    .resource-title {
+        font-size: 20px;
+        color: #1e293b;
+        font-weight: 700;
+        margin-bottom: 18px;
+    }
+
+    .download-btn {
+        display: inline-block;
+        padding: 12px 22px;
+        background: linear-gradient(135deg, #4f46e5, #7c3aed);
+        color: white;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 600;
+        text-decoration: none;
+        position: relative;
+        z-index: 10;
+    }
+</style>
+</head>
+
+<body>
+
+<div class="header">Learning Resources</div>
+
+<div class="container">
+
+    <div class="search-filter-box">
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="Search study materials..." onkeyup="filterResources()">
+        </div>
+
+        <div class="filter-box">
+            <select id="categoryFilter" onchange="filterResources()">
+                <option value="all">All Categories</option>
+                <option value="Aptitude">Aptitude</option>
+                <option value="Programming">Programming</option>
+                <option value="Cybersecurity">Cybersecurity</option>
+                <option value="AI ML">AI / ML</option>
+                <option value="Placement">Placement</option>
+                <option value="Networking">Networking</option>
+                <option value="Soft Skills">Soft Skills</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="resources-grid" id="resourceGrid"></div>
+</div>
+
+<script>
+async function loadResources() {
+    const resourceGrid = document.getElementById('resourceGrid');
+
+    try {
+        /* ✅ FIXED API URL */
+        const res = await fetch('http://localhost:3000/api/learning-resources', {
+            cache: "no-store"
+        });
+
+        const data = await res.json();
+        console.log("Learning resources response:", data);
+
+        /* ✅ STRONG VALIDATION */
+        if (!data.success || !Array.isArray(data.resources)) {
+            resourceGrid.innerHTML = '<p style="color:red;">Failed to load resources</p>';
+            return;
+        }
+
+        resourceGrid.innerHTML = '';
+
+        data.resources.forEach(resource => {
+            const card = document.createElement('div');
+            card.className = 'resource-card';
+            card.setAttribute('data-title', resource.title?.trim() || '');
+            card.setAttribute('data-category', resource.category || 'general');
+
+            /* ✅ SAFE FILE URL (NO undefined) */
+            const fileUrl = resource.link
+                ? resource.link
+                : '#';
+
+            card.innerHTML = `
+                <div class="resource-title">${resource.title}</div>
+                ${
+                    resource.link
+                    ? `<a class="download-btn" href="${fileUrl}" download>
+                        Download
+                       </a>`
+                    : `<span style="color:red;">File not available</span>`
+                }
+            `;
+
+            resourceGrid.appendChild(card);
+        });
+
+    } catch (err) {
+        console.error("Load resources error:", err);
+        resourceGrid.innerHTML = '<p style="color:red;">Failed to load resources</p>';
+    }
+}
+
+function filterResources() {
+    const searchText = document.getElementById("searchInput").value.toLowerCase();
+    const category = document.getElementById("categoryFilter").value;
+    const cards = document.querySelectorAll(".resource-card");
+
+    cards.forEach(card => {
+        const title = card.getAttribute("data-title").toLowerCase();
+        const cat = card.getAttribute("data-category");
+
+        card.style.display =
+            title.includes(searchText) && (category === "all" || category === cat)
+            ? "block"
+            : "none";
+    });
+}
+
+window.addEventListener('DOMContentLoaded', loadResources);
+</script>
+
+
+
+</body>
+</html>

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logging Out...</title>
+    <style>
+        body {
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #f4f4f4;
+            font-family: Arial, sans-serif;
+        }
+
+        .box {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .box h2 {
+            margin: 0 0 10px;
+            color: #333;
+        }
+
+        .box p {
+            color: #555;
+        }
+
+        .loader {
+            margin: 15px auto;
+            border: 4px solid #ddd;
+            border-top: 4px solid #3498db;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="box">
+        <h2>Logging Out...</h2>
+        <p>Please wait, redirecting.</p>
+        <div class="loader"></div>
+    </div>
+
+    <script>
+    // Get the student ID from localStorage (assumes you store it on login)
+    const studentId = localStorage.getItem("studentId");
+
+    if (studentId) {
+        // Call backend logout API
+        fetch("http://localhost:3000/auth/logout", {
+            method: "POST",
+            headers: { 
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ studentId })
+        })
+        .then(res => res.json())
+        .then(data => {
+            console.log("Logout response:", data);
+
+            // Clear session/localStorage
+            localStorage.removeItem("studentLoggedIn");
+            localStorage.removeItem("studentId");
+
+            // Redirect to login page
+            setTimeout(() => {
+                window.location.href = "login.html";
+            }, 1000); // 1 second delay
+        })
+        .catch(err => {
+            console.error("Logout failed:", err);
+
+            // Clear session anyway and redirect
+            localStorage.removeItem("studentLoggedIn");
+            localStorage.removeItem("studentId");
+            window.location.href = "login.html";
+        });
+    } else {
+        // If no studentId found, just redirect
+        window.location.href = "login.html";
+    }
+</script>
+
+
+</body>
+</html>

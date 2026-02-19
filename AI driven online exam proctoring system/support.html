@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Support - Student Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-dark: #3a56d4;
+            --secondary: #7209b7;
+            --accent: #f72585;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --gray: #6c757d;
+            --success: #06d6a0;
+            --border-radius: 12px;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            color: var(--dark);
+            line-height: 1.6;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 700px;
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            transition: var(--transition);
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        .header {
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            color: white;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+
+        .header h2 {
+            font-size: 2.2rem;
+            margin-bottom: 8px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .header h2 i {
+            font-size: 1.8rem;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 12px;
+            border-radius: 50%;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            max-width: 500px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .form-container {
+            padding: 40px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        .form-group label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--dark);
+            font-size: 1rem;
+        }
+
+        .form-group label i {
+            color: var(--primary);
+            width: 20px;
+            text-align: center;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 16px 20px;
+            border: 2px solid #e9ecef;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            transition: var(--transition);
+            background-color: #f8f9fa;
+            color: var(--dark);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            background-color: white;
+            box-shadow: 0 0 0 4px rgba(67, 97, 238, 0.15);
+        }
+
+        .form-control::placeholder {
+            color: #adb5bd;
+        }
+
+        textarea.form-control {
+            min-height: 140px;
+            resize: vertical;
+            font-family: inherit;
+        }
+
+        select.form-control {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%234361ee' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 20px center;
+            background-size: 16px;
+            padding-right: 50px;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 10px;
+            letter-spacing: 0.5px;
+        }
+
+        .submit-btn:hover {
+            background: linear-gradient(to right, var(--primary-dark), #651fa3);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(67, 97, 238, 0.3);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        /* Popup Modal Styles */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 40px;
+            max-width: 450px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+            animation: slideUp 0.5s ease-out;
+            position: relative;
+        }
+
+        .modal-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(to right, var(--success), #06b48a);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 25px;
+            font-size: 2.5rem;
+            color: white;
+            animation: scaleIn 0.5s ease-out 0.2s both;
+        }
+
+        .modal h3 {
+            font-size: 1.8rem;
+            color: var(--dark);
+            margin-bottom: 15px;
+        }
+
+        .modal p {
+            color: var(--gray);
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .modal-btn {
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            border-radius: var(--border-radius);
+            padding: 14px 30px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .modal-btn:hover {
+            background: linear-gradient(to right, var(--primary-dark), #651fa3);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(67, 97, 238, 0.3);
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--gray);
+            cursor: pointer;
+            transition: var(--transition);
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+
+        .modal-close:hover {
+            background-color: #f5f5f5;
+            color: var(--dark);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes scaleIn {
+            from { transform: scale(0); }
+            to { transform: scale(1); }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                max-width: 100%;
+            }
+            
+            .form-container {
+                padding: 30px 25px;
+            }
+            
+            .header {
+                padding: 25px 20px;
+            }
+            
+            .header h2 {
+                font-size: 1.8rem;
+            }
+            
+            .modal {
+                padding: 30px 25px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 15px;
+            }
+            
+            .form-container {
+                padding: 25px 20px;
+            }
+            
+            .header h2 {
+                font-size: 1.6rem;
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .submit-btn {
+                padding: 16px;
+            }
+            
+            .modal-icon {
+                width: 70px;
+                height: 70px;
+                font-size: 2rem;
+            }
+            
+            .modal h3 {
+                font-size: 1.5rem;
+            }
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #e9ecef;
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Popup Modal -->
+    <div class="modal-overlay" id="successModal">
+        <div class="modal">
+            <button class="modal-close" id="closeModal">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="modal-icon">
+                <i class="fas fa-check"></i>
+            </div>
+            <h3>Request Submitted Successfully!</h3>
+            <p>Your support request has been submitted to the faculty/admin. We'll get back to you within 24 hours.</p>
+            <button class="modal-btn" id="okButton">
+                <i class="fas fa-thumbs-up"></i> Got It
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container">
+        <div class="header">
+            <h2><i class="fas fa-headset"></i> Student Support</h2>
+            <p>Contact faculty or admin for any support</p>
+        </div>
+
+        <div class="form-container">
+            <form id="supportForm">
+                <div class="form-group">
+                    <label for="name"><i class="fas fa-user"></i> Name</label>
+                    <input type="text" id="name" class="form-control" placeholder="Enter your full name" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="email"><i class="fas fa-envelope"></i> Email</label>
+                    <input type="email" id="email" class="form-control" placeholder="Enter your email address" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="issueType"><i class="fas fa-exclamation-circle"></i> Issue Type</label>
+                    <select id="issueType" class="form-control" required>
+                        <option value="" disabled selected>Select an option</option>
+                        <option value="technical">Technical Issue</option>
+                        <option value="exam">Exam / Test Issue</option>
+                        <option value="faculty">Faculty Support</option>
+                        <option value="account">Account Login Issue</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="message"><i class="fas fa-comment-dots"></i> Message</label>
+                    <textarea id="message" class="form-control" placeholder="Describe your issue in detail..." required></textarea>
+                </div>
+
+                <button type="submit" class="submit-btn">
+                    <i class="fas fa-paper-plane"></i> Submit Request
+                </button>
+            </form>
+        </div>
+    </div>
+
+  <script>
+    const form = document.getElementById("supportForm");
+    const successModal = document.getElementById("successModal");
+    const closeModal = document.getElementById("closeModal");
+    const okButton = document.getElementById("okButton");
+
+    // Add focus effects to form inputs
+    const formControls = document.querySelectorAll('.form-control');
+    formControls.forEach(control => {
+        control.addEventListener('focus', function() {
+            this.parentElement.classList.add('focused');
+        });
+
+        control.addEventListener('blur', function() {
+            if (this.value === "") {
+                this.parentElement.classList.remove('focused');
+            }
+        });
+
+        control.addEventListener('input', function() {
+            if (this.checkValidity()) {
+                this.style.borderColor = '#06d6a0';
+            } else {
+                this.style.borderColor = '#e9ecef';
+            }
+        });
+    });
+
+    // Function to show modal
+    function showModal() {
+        successModal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    // Function to hide modal
+    function hideModal() {
+        successModal.classList.remove('active');
+        document.body.style.overflow = 'auto';
+    }
+
+    // Form submission
+    form.addEventListener("submit", async function(e) {
+        e.preventDefault();
+
+        // Simple validation
+        let isValid = true;
+        formControls.forEach(control => {
+            if (!control.checkValidity()) {
+                isValid = false;
+                control.style.borderColor = '#f72585';
+            }
+        });
+
+        if (!isValid) {
+            form.style.animation = 'none';
+            setTimeout(() => { form.style.animation = 'shake 0.5s'; }, 10);
+            setTimeout(() => { form.style.animation = ''; }, 500);
+            return;
+        }
+
+        // Prepare data to send
+        const data = {
+            name: document.getElementById("name").value.trim(),
+            email: document.getElementById("email").value.trim(),
+            issueType: document.getElementById("issueType").value,
+            message: document.getElementById("message").value.trim()
+        };
+
+        try {
+            // Send data to backend
+            const response = await fetch("http://localhost:3000/api/support", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(data)
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                // Show success modal
+                showModal();
+
+                // Reset form
+                form.reset();
+                formControls.forEach(control => control.style.borderColor = '#e9ecef');
+
+                // Auto-close modal after 5 seconds
+                setTimeout(hideModal, 5000);
+            } else {
+                alert(result.message || "Failed to submit request.");
+            }
+
+        } catch (err) {
+            console.error("Error submitting support request:", err);
+            alert("Something went wrong. Please try again later.");
+        }
+    });
+
+    // Close modal events
+    closeModal.addEventListener('click', hideModal);
+    okButton.addEventListener('click', hideModal);
+
+    successModal.addEventListener('click', function(e) {
+        if (e.target === successModal) hideModal();
+    });
+
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && successModal.classList.contains('active')) {
+            hideModal();
+        }
+    });
+
+    // Add shake animation for form validation
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+        
+        .form-group.focused label {
+            color: var(--primary);
+        }
+    `;
+    document.head.appendChild(style);
+
+    // Add visual feedback for required fields
+    const labels = document.querySelectorAll('label');
+    labels.forEach(label => {
+        if (label.querySelector('input[required], select[required], textarea[required]')) {
+            const span = document.createElement('span');
+            span.textContent = ' *';
+            span.style.color = '#f72585';
+            label.appendChild(span);
+        }
+    });
+</script>
+
+
+</body>
+</html>

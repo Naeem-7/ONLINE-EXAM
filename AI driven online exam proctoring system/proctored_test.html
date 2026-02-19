@@ -1,0 +1,1749 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Proctored Online Test</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- ===================== -->
+    <!-- AI / ML LIBRARIES (CORRECT & STABLE) -->
+    <!-- ===================== -->
+
+    <!-- ✅ TensorFlow.js (COMPATIBLE WITH FACE-API) -->
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.7.4/dist/tf.min.js"></script>
+
+<!-- ✅ Face API -->
+<script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
+
+<!-- ✅ Object Detection -->
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd@2.2.2"></script>
+
+<!-- MediaPipe -->
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"></script>
+
+</head>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            color: #333;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        /* Header */
+        .header {
+            background: #2c3e50;
+            color: white;
+            padding: 15px 25px;
+            text-align: center;
+            position: relative;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .warning-counter {
+            position: absolute;
+            right: 25px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #e74c3c;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* Webcam and Timer Section */
+        .webcam-timer-section {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px 25px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e0e0e0;
+            align-items: center;
+        }
+
+        /* Webcam Section */
+        .webcam-container {
+            width: 200px;
+            height: 150px;
+            background: #1a1a1a;
+            border-radius: 8px;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 2px solid #3498db;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            position: relative;
+        }
+
+        #webcamVideo {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .webcam-placeholder {
+            color: #fff;
+            text-align: center;
+            padding: 10px;
+        }
+
+        .webcam-placeholder i {
+            font-size: 24px;
+            margin-bottom: 8px;
+            color: #7f8c8d;
+        }
+
+        .webcam-placeholder p {
+            font-size: 12px;
+        }
+
+        .webcam-status {
+            position: absolute;
+            bottom: 5px;
+            left: 5px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+        }
+
+        /* Timer Section */
+        .timer {
+            background: #e74c3c;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 24px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: white;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Main Layout */
+        .main {
+            display: flex;
+            gap: 20px;
+            padding: 20px;
+        }
+
+        /* Question Area */
+        .question-area {
+            flex: 1;
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            border: 1px solid #e0e0e0;
+        }
+
+        .question-header {
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .question-number {
+            font-size: 18px;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+
+        .question-text {
+            font-size: 18px;
+            line-height: 1.5;
+            margin-bottom: 25px;
+            color: #2c3e50;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 30px;
+        }
+
+        .option {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .option:hover {
+            background: #f8f9fa;
+            border-color: #3498db;
+        }
+
+        .option input {
+            margin-right: 12px;
+            transform: scale(1.2);
+            cursor: pointer;
+        }
+
+        .option label {
+            cursor: pointer;
+            font-size: 16px;
+            flex: 1;
+        }
+
+        .navigation-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-secondary {
+            background: #2c3e50;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #1a252f;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(44, 62, 80, 0.3);
+        }
+
+        .btn-primary {
+            background: #3498db;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(52, 152, 219, 0.3);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn-review {
+            background: #9b59b6;
+            color: white;
+        }
+
+        .btn-review:hover {
+            background: #8e44ad;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(155, 89, 182, 0.3);
+        }
+
+        .btn-clear {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .btn-clear:hover {
+            background: #c0392b;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(231, 76, 60, 0.3);
+        }
+
+        /* Right Side Panel */
+        .side-panel {
+            width: 320px;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid #e0e0e0;
+            height: fit-content;
+        }
+
+        .panel-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 14px;
+        }
+
+        .color-box {
+            width: 16px;
+            height: 16px;
+            border-radius: 3px;
+        }
+
+        .answered-box {
+            background: #27ae60;
+        }
+
+        .not-answered-box {
+            background: #e74c3c;
+        }
+
+        .review-box {
+            background: #9b59b6;
+        }
+
+        .not-visited-box {
+            background: #bdc3c7;
+        }
+
+        .current-box {
+            border: 2px solid #3498db;
+            background: white;
+        }
+
+        /* Section Tabs */
+        .section-tabs {
+            display: flex;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .section-tab {
+            flex: 1;
+            padding: 10px;
+            text-align: center;
+            background: #f8f9fa;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .section-tab.active {
+            background: white;
+            border-bottom: 3px solid #3498db;
+            color: #3498db;
+        }
+
+        .palette-container {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+            margin-bottom: 25px;
+        }
+
+        .num-box {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #bdc3c7; /* Not visited */
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.2s;
+            font-size: 14px;
+        }
+
+        .num-box:hover {
+            transform: scale(1.1);
+        }
+
+        .answered {
+            background: #27ae60 !important;
+            color: white;
+        }
+
+        .not-answered {
+            background: #e74c3c !important;
+            color: white;
+        }
+
+        .review {
+            background: #9b59b6 !important;
+            color: white;
+        }
+
+        .current {
+            border: 2px solid #3498db !important;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 14px;
+            background: #27ae60;
+            border: none;
+            color: white;
+            font-size: 17px;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .submit-btn:hover {
+            background: #219653;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(39, 174, 96, 0.3);
+        }
+
+        /* Confirmation Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+            text-align: center;
+        }
+
+        .modal-icon {
+            font-size: 48px;
+            color: #e74c3c;
+            margin-bottom: 15px;
+        }
+
+        .modal-title {
+            font-size: 22px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+
+        .modal-message {
+            font-size: 16px;
+            margin-bottom: 25px;
+            color: #555;
+            line-height: 1.5;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .modal-btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .modal-btn-yes {
+            background: #27ae60;
+            color: white;
+        }
+
+        .modal-btn-yes:hover {
+            background: #219653;
+        }
+
+        .modal-btn-no {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .modal-btn-no:hover {
+            background: #c0392b;
+        }
+
+        /* Warning Modal */
+        .warning-modal {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            border-left: 6px solid #e74c3c;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(231, 76, 60, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0); }
+        }
+
+        .warning-icon {
+            font-size: 48px;
+            color: #e74c3c;
+            margin-bottom: 15px;
+        }
+
+        .warning-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #e74c3c;
+        }
+
+        .warning-message {
+            font-size: 16px;
+            margin-bottom: 25px;
+            color: #555;
+            line-height: 1.5;
+        }
+
+        .warning-btn {
+            padding: 12px 30px;
+            background: #e74c3c;
+            border: none;
+            color: white;
+            font-size: 16px;
+            font-weight: 500;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .warning-btn:hover {
+            background: #c0392b;
+        }
+
+        /* Score Page */
+        .score-page {
+            display: none;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .score-title {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+
+        .score-message {
+            font-size: 18px;
+            margin-bottom: 30px;
+            color: #555;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            line-height: 1.6;
+        }
+
+        .view-result-btn {
+            padding: 14px 30px;
+            background: #3498db;
+            border: none;
+            color: white;
+            font-size: 17px;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 10px;
+            text-decoration: none;
+        }
+
+        .view-result-btn:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .main {
+                flex-direction: column;
+            }
+            
+            .side-panel {
+                width: 100%;
+            }
+            
+            .webcam-timer-section {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .webcam-container {
+                width: 100%;
+                height: 200px;
+            }
+            
+            .warning-counter {
+                position: static;
+                margin-top: 10px;
+                transform: none;
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .header {
+                padding: 15px;
+            }
+            
+            .navigation-buttons {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+            
+            .btn {
+                justify-content: center;
+                width: 100%;
+            }
+            
+            .palette-container {
+                grid-template-columns: repeat(4, 1fr);
+            }
+            
+            .timer {
+                font-size: 20px;
+                padding: 12px 20px;
+            }
+            
+            .modal-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-file-alt"></i> AI-Proctored Online Test</h1>
+            <div class="warning-counter">
+                <i class="fas fa-exclamation-triangle"></i>
+                <span id="warningCount">0 Warnings</span>
+            </div>
+        </div>
+
+        <!-- Webcam and Timer Section -->
+        <div class="webcam-timer-section">
+            <!-- Webcam Section -->
+            <div class="webcam-container">
+                <!-- ✅ FIXED VIDEO ELEMENT -->
+                <video
+                    id="webcamVideo"
+                    autoplay
+                    muted
+                    playsinline
+                    width="320"
+                    height="240">
+                </video>
+
+                <div class="webcam-placeholder" id="webcamPlaceholder">
+                    <i class="fas fa-video"></i>
+                    <p>Webcam Active</p>
+                </div>
+                <div class="webcam-status" id="webcamStatus">
+                    AI Monitoring: Active
+                </div>
+            </div>
+
+            <!-- Timer Section -->
+            <div class="timer">
+                <i class="fas fa-clock"></i>
+                <span id="timer">00:00:00</span>
+            </div>
+        </div>
+
+        <!-- Test Interface -->
+        <div class="main" id="testInterface">
+            <!-- Question Area -->
+            <div class="question-area">
+                <div class="question-header">
+                    <div class="question-number" id="questionNumber">
+                        Question 1 of 100
+                    </div>
+                </div>
+
+                <div class="question-text" id="questionText">
+                    Loading questions...
+                </div>
+
+                <div class="options" id="optionsContainer"></div>
+
+                <div class="navigation-buttons">
+                    <button class="btn btn-secondary" id="prevBtn">
+                        <i class="fas fa-arrow-left"></i> Previous
+                    </button>
+                    <button class="btn btn-primary" id="nextBtn">
+                        Next <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="btn btn-review" id="reviewBtn">
+                        <i class="fas fa-flag"></i> Mark for Review
+                    </button>
+                    <button class="btn btn-clear" id="clearBtn">
+                        <i class="fas fa-eraser"></i> Clear Response
+                    </button>
+                </div>
+            </div>
+
+            <!-- Right Side Panel -->
+            <div class="side-panel">
+                <div class="panel-title">
+                    <i class="fas fa-th"></i> Question Palette
+                </div>
+
+                <div class="legend">
+                    <div class="legend-item">
+                        <div class="color-box answered-box"></div>
+                        <span>Answered</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="color-box not-answered-box"></div>
+                        <span>Not Answered</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="color-box review-box"></div>
+                        <span>Marked for Review</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="color-box not-visited-box"></div>
+                        <span>Not Visited</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="color-box current-box"></div>
+                        <span>Current</span>
+                    </div>
+                </div>
+
+                <div class="section-tabs" id="sectionTabs">
+                    <div class="section-tab active" data-section="0">Section A</div>
+                    <div class="section-tab" data-section="1">Section B</div>
+                    <div class="section-tab" data-section="2">Section C</div>
+                    <div class="section-tab" data-section="3">Section D</div>
+                </div>
+
+                <div class="palette-container" id="paletteA"></div>
+                <div class="palette-container" id="paletteB" style="display:none;"></div>
+                <div class="palette-container" id="paletteC" style="display:none;"></div>
+                <div class="palette-container" id="paletteD" style="display:none;"></div>
+
+                <button class="submit-btn" id="submitBtn">
+                    <i class="fas fa-paper-plane"></i> Submit Test
+                </button>
+            </div>
+        </div>
+
+        <!-- Score Page -->
+        <div class="score-page" id="scorePage">
+            <div class="score-title">Test Completed Successfully!</div>
+            <div class="score-message">
+                Thank you for completing the online test. Your results have been recorded.
+            </div>
+            <a href="result.html" class="view-result-btn" id="viewResultBtn">
+                <i class="fas fa-chart-bar"></i> View Result
+            </a>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div class="modal-overlay" id="confirmationModal">
+        <div class="modal">
+            <div class="modal-icon">
+                <i class="fas fa-exclamation-circle"></i>
+            </div>
+            <div class="modal-title">Confirm Submission</div>
+            <div class="modal-message">
+                Do you really want to submit your test?
+            </div>
+            <div class="modal-buttons">
+                <button class="modal-btn modal-btn-no" id="cancelSubmit">No</button>
+                <button class="modal-btn modal-btn-yes" id="confirmSubmit">Yes</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Warning Modal -->
+    <div class="modal-overlay" id="warningModal">
+        <div class="warning-modal">
+            <div class="warning-icon">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <div class="warning-title" id="warningTitle">
+                Suspicious Activity Detected
+            </div>
+            <div class="warning-message" id="warningMessage"></div>
+            <button class="warning-btn" id="dismissWarning">
+                Acknowledge Warning
+            </button>
+        </div>
+    </div>
+
+
+
+
+
+
+
+
+<script src="https://cdn.socket.io/4.7.1/socket.io.min.js"></script>
+<script>
+
+/* =====================================================
+   GLOBAL FLAGS (FIX DOUBLE START)
+===================================================== */
+let examStarted = false;
+let examTerminated = false; // ✅ NEW
+
+/* =====================================================
+   TERMINATION LIMITS
+===================================================== */
+let identityMismatchCount = 0;
+let aiWarningCount = 0;
+
+const MAX_IDENTITY_MISMATCH = 1;                // 🔁 Ends exam immediately after 1 mismatch
+const MAX_AI_WARNINGS = 5;                       // Ends exam after 5 AI warnings
+
+/* =====================================================
+   FACE-API DETECTOR OPTIONS
+===================================================== */
+const faceOptions = new faceapi.SsdMobilenetv1Options({
+    minConfidence: 0.4
+});
+
+/* =====================================================
+   FACE VERIFICATION + IDENTITY STATE
+===================================================== */
+const FACE_MATCH_THRESHOLD = 0.65;               
+const IDENTITY_CHECK_INTERVAL = 15000;
+
+let faceModelsPromise = null;
+let registeredFaceDescriptor = null;
+let identityInterval = null;
+
+/* =====================================================
+   SAFE EXAM TERMINATION (CENTRALIZED)
+===================================================== */
+function endExamDueToViolation(title, reason) {   
+    if (examTerminated) return;
+    examTerminated = true;
+
+    alert(`❌ Exam Terminated\n\n${title}\n${reason}`);
+
+    if (identityInterval) clearInterval(identityInterval);
+    if (timerInterval) clearInterval(timerInterval);
+    if (webcamStream) webcamStream.getTracks().forEach(t => t.stop());
+
+    socket.emit("student_alert", {
+        exam_id: window.examId,
+        regno: studentSocketId,
+        message: title,
+        reason,
+        timestamp: new Date().toISOString()
+    });
+
+    submitTestWithSocket();
+}
+
+/* =====================================================
+   FACE MODEL LOADER
+===================================================== */
+function loadFaceModelsOnce() {
+    if (!faceModelsPromise) {
+        faceModelsPromise = Promise.all([
+            faceapi.nets.ssdMobilenetv1.loadFromUri("http://localhost:3000/models"),
+            faceapi.nets.faceLandmark68Net.loadFromUri("http://localhost:3000/models"),
+            faceapi.nets.faceRecognitionNet.loadFromUri("http://localhost:3000/models")
+        ]);
+    }
+    return faceModelsPromise;
+}
+
+/* =====================================================
+   FACE VERIFICATION GATE
+===================================================== */
+
+async function startFaceVerificationGate() {
+    let preExamMismatchCount = 0;   // 🔒 NEW
+
+    const container = document.createElement("div");
+    container.style = `
+        position:fixed; inset:0; background:#020617;
+        display:flex; flex-direction:column;
+        justify-content:center; align-items:center;
+        z-index:9999; color:white;
+    `;
+
+    container.innerHTML = `
+        <h2>Face Verification Required</h2>
+        <video id="verifyVideo" autoplay muted style="width:320px;border-radius:10px;"></video>
+        <button id="verifyBtn">Verify Face</button>
+        <p id="verifyStatus"></p>
+    `;
+
+    document.body.appendChild(container);
+
+    const video = document.getElementById("verifyVideo");
+    const status = document.getElementById("verifyStatus");
+
+    const stream = await navigator.mediaDevices.getUserMedia({
+        video: { width: { ideal: 640 }, height: { ideal: 480 }, facingMode: "user" }
+    });
+
+    video.srcObject = stream;
+    await video.play();
+
+    status.textContent = "Loading face models...";
+    await loadFaceModelsOnce();
+
+    document.getElementById("verifyBtn").onclick = async () => {
+        const detection = await faceapi
+            .detectSingleFace(video, faceOptions)
+            .withFaceLandmarks()
+            .withFaceDescriptor();
+
+        if (!detection) {
+            status.textContent = "❌ Face not detected";
+            return;
+        }
+
+        const studentId =
+            localStorage.getItem("student_id") ||
+            localStorage.getItem("register_number");
+
+        const res = await fetch(`http://localhost:3000/api/face/get/${studentId}`);
+        const data = await res.json();
+
+        if (!data.descriptor) {
+            status.textContent = "❌ No registered face found";
+            return;
+        }
+
+        const storedDescriptor = new Float32Array(data.descriptor);
+        const distance = faceapi.euclideanDistance(
+            detection.descriptor,
+            storedDescriptor
+        );
+
+        // ✅ MATCH → ALLOW EXAM
+        if (distance < FACE_MATCH_THRESHOLD) {
+            registeredFaceDescriptor = storedDescriptor;
+
+            stream.getTracks().forEach(t => t.stop());
+            container.remove();
+
+            // 🔓 ONLY PLACE EXAM CAN START
+            document.dispatchEvent(new Event("exam-verified"));
+            return;
+        }
+
+        // ❌ MISMATCH → HARD BLOCK
+        preExamMismatchCount++;
+
+        status.textContent = "❌ Face mismatch. Access denied.";
+
+        // 🔒 Immediately block exam access
+        if (preExamMismatchCount >= 1) {
+            stream.getTracks().forEach(t => t.stop());
+            container.remove();
+
+            alert(
+                "❌ Face Verification Failed\n\n" +
+                "Your face does not match the registered student.\n" +
+                "You are not allowed to attend this exam."
+            );
+
+            // 🔁 Redirect safely
+            window.location.href = "profile.html";
+        }
+    };
+}
+
+
+
+/* =====================================================
+   CONTINUOUS IDENTITY MONITORING
+===================================================== */
+async function verifySamePersonContinuously() {
+    if (!webcamVideo || webcamVideo.readyState < 3 || examTerminated) return;
+
+    const detection = await faceapi
+        .detectSingleFace(webcamVideo, faceOptions)
+        .withFaceLandmarks()
+        .withFaceDescriptor();
+
+    if (!detection) return;
+
+    const distance = faceapi.euclideanDistance(
+        detection.descriptor,
+        registeredFaceDescriptor
+    );
+
+    if (distance > FACE_MATCH_THRESHOLD) {
+        identityMismatchCount++;
+
+        triggerAIWarning(
+            "Identity Mismatch",
+            `Different person detected (${identityMismatchCount}/${MAX_IDENTITY_MISMATCH})`,
+            "high"
+        );
+
+        if (identityMismatchCount >= MAX_IDENTITY_MISMATCH) {
+            endExamDueToViolation(
+                "Identity Fraud Detected",
+                "Repeated identity mismatch during exam"
+            );
+        }
+    }
+}
+
+function startIdentityMonitoring() {
+    if (identityInterval) return;
+    identityInterval = setInterval(verifySamePersonContinuously, IDENTITY_CHECK_INTERVAL);
+}
+
+/* =====================================================
+   BLOCK EXAM UNTIL VERIFIED
+===================================================== */
+document.addEventListener("DOMContentLoaded", startFaceVerificationGate);
+
+document.addEventListener("exam-verified", async () => {
+    if (examStarted) return;
+    examStarted = true;
+
+    await loadExamQuestions();
+    initializePalette();
+    updateQuestion();
+    startTimer();
+    await startWebcam();
+    setupEventListeners();
+    startIdentityMonitoring();
+});
+
+/* =====================================================
+   EXAM ID SETUP
+===================================================== */
+(function () {
+    const params = new URLSearchParams(window.location.search);
+    const examIdFromUrl = params.get("exam_id");
+    const storedExamId = localStorage.getItem("exam_id");
+
+    if (examIdFromUrl) {
+        window.examId = examIdFromUrl;
+        localStorage.setItem("exam_id", examIdFromUrl);
+    } else if (storedExamId) {
+        window.examId = storedExamId;
+    } else {
+        alert("❌ Exam ID missing! Start exam from dashboard.");
+        window.location.href = "profile.html";
+    }
+})();
+
+/* =====================================================
+   SOCKET.IO
+===================================================== */
+const studentSocketId =
+    localStorage.getItem("student_id") ||
+    localStorage.getItem("register_number");
+
+const socket = io("http://localhost:3000");
+
+socket.on("connect", () => {
+    socket.emit("student-active", { studentId: studentSocketId });
+    socket.emit("join_exam", {
+        exam_id: window.examId,
+        role: "student",
+        regno: studentSocketId
+    });
+});
+
+/* =====================================================
+   STATE VARIABLES
+===================================================== */
+let questions = [];
+let totalQuestions = 0;
+const questionsPerSection = 25;
+let currentQuestion = 0;
+let currentSection = 0;
+let warningCount = 0;
+let timerInterval;
+let timeLeft = 7200;
+let webcamStream;
+let answers = [];
+let statuses = [];
+let markedForReview = [];
+
+/* =====================================================
+   DOM ELEMENTS
+===================================================== */
+const webcamVideo = document.getElementById('webcamVideo');
+const webcamPlaceholder = document.getElementById('webcamPlaceholder');
+const webcamStatus = document.getElementById('webcamStatus');
+const timerElement = document.getElementById('timer');
+const warningCountElement = document.getElementById('warningCount');
+const questionNumberElement = document.getElementById('questionNumber');
+const questionTextElement = document.getElementById('questionText');
+const optionsContainer = document.getElementById('optionsContainer');
+const prevBtn = document.getElementById('prevBtn');
+const nextBtn = document.getElementById('nextBtn');
+const reviewBtn = document.getElementById('reviewBtn');
+const clearBtn = document.getElementById('clearBtn');
+const submitBtn = document.getElementById('submitBtn');
+const sectionTabs = document.getElementById('sectionTabs');
+const paletteA = document.getElementById('paletteA');
+const paletteB = document.getElementById('paletteB');
+const paletteC = document.getElementById('paletteC');
+const paletteD = document.getElementById('paletteD');
+const confirmationModal = document.getElementById('confirmationModal');
+const warningModal = document.getElementById('warningModal');
+const cancelSubmitBtn = document.getElementById('cancelSubmit');
+const confirmSubmitBtn = document.getElementById('confirmSubmit');
+const dismissWarningBtn = document.getElementById('dismissWarning');
+
+/* =====================================================
+   FETCH QUESTIONS + DURATION
+===================================================== */
+async function loadExamQuestions() {
+    try {
+        const examId = window.examId;
+        if (!examId) return alert("Exam ID missing!");
+
+        const backendUrl = `http://localhost:3000/api/exams/${examId}/questions`;
+
+        console.log("Fetching questions from:", backendUrl);
+
+        const res = await fetch(backendUrl);
+        if (!res.ok) {
+            console.error("Failed to fetch questions:", res.status, res.statusText);
+            alert(`Failed to load questions. Status: ${res.status}`);
+            return;
+        }
+
+        const data = await res.json();
+
+        if (!data.questions || data.questions.length === 0) {
+            console.warn("No questions found for this exam.");
+            alert("No questions found for this exam!");
+            return;
+        }
+
+        questions = data.questions.map(q => ({
+            id: q.id,
+            question: q.question,
+            option_a: q.option_a,
+            option_b: q.option_b,
+            option_c: q.option_c,
+            option_d: q.option_d,
+            correct_answer: q.correct_answer,
+            marks: q.marks || 1
+        }));
+
+        totalQuestions = questions.length;
+        answers = new Array(totalQuestions).fill(null);
+        statuses = new Array(totalQuestions).fill('not-visited');
+        markedForReview = new Array(totalQuestions).fill(false);
+
+        if (data.duration) {
+            timeLeft = data.duration * 60;
+            console.log(`⏱ Exam duration set: ${data.duration} minutes`);
+        }
+
+        console.log(`✅ Loaded ${totalQuestions} questions successfully.`);
+
+    } catch (err) {
+        console.error("Error loading exam questions:", err);
+        alert("Unexpected error loading questions. Check console for details.");
+    }
+}
+
+/* =====================
+   TIMER
+===================== */
+function startTimer() {
+    updateTimerDisplay();
+    timerInterval = setInterval(() => {
+        timeLeft--;
+        updateTimerDisplay();
+        if (timeLeft <= 0) {
+            clearInterval(timerInterval);
+            submitTestWithSocket();
+        }
+    }, 1000);
+}
+
+function updateTimerDisplay() {
+    const hours = Math.floor(timeLeft / 3600);
+    const minutes = Math.floor((timeLeft % 3600) / 60);
+    const seconds = timeLeft % 60;
+    timerElement.textContent = `${hours.toString().padStart(2,'0')}:${minutes.toString().padStart(2,'0')}:${seconds.toString().padStart(2,'0')}`;
+    timerElement.style.color = timeLeft < 300 ? '#ff6b6b' : '#000';
+}
+
+/* =====================
+   BUTTONS & ANSWERS
+===================== */
+function saveAnswer() {
+    const selected = optionsContainer.querySelector('input[name="option"]:checked');
+    const questionId = questions[currentQuestion].id;
+    answers[currentQuestion] = {
+        question_id: questionId,
+        selected_option: selected ? selected.value : null
+    };
+    statuses[currentQuestion] = selected ? 'answered' : (markedForReview[currentQuestion] ? 'review' : 'not-answered');
+    updatePalette();
+}
+
+function markForReview() {
+    markedForReview[currentQuestion] = !markedForReview[currentQuestion];
+    statuses[currentQuestion] = markedForReview[currentQuestion] ? 'review' : (answers[currentQuestion] ? 'answered' : 'not-answered');
+    reviewBtn.textContent = markedForReview[currentQuestion] ? "Unmark Review" : "Mark for Review";
+    updatePalette();
+}
+
+function clearResponse() {
+    answers[currentQuestion] = null;
+    if (!markedForReview[currentQuestion]) statuses[currentQuestion] = 'not-answered';
+    const options = optionsContainer.querySelectorAll('input[name="option"]');
+    options.forEach(o => o.checked = false);
+    updatePalette();
+}
+
+/* =====================
+   CALCULATE RESULT
+===================== */
+function calculateResult(questions, answersArray, warningCount) {
+    let correctCount = 0;
+    let obtainedMarks = 0;
+    let maxMarks = 0;
+
+    const totalQuestions = questions.length;
+
+    const questionMap = {};
+    questions.forEach(q => {
+        const marks = Number(q.marks) || 1;
+        maxMarks += marks;
+
+        questionMap[q.id] = {
+            correct_answer: q.correct_answer.trim().toLowerCase(),
+            marks
+        };
+    });
+
+    answersArray.forEach(answer => {
+        if (!answer || !answer.selected_option || !answer.question_id) return;
+
+        const question = questionMap[answer.question_id];
+        if (!question) return;
+
+        const selected = answer.selected_option.trim().toLowerCase();
+
+        if (selected === question.correct_answer) {
+            correctCount++;
+            obtainedMarks += question.marks;
+        }
+    });
+
+    const wrongCount = totalQuestions - correctCount;
+
+    const integrityPercent = Math.max(0, 100 - warningCount * 5);
+
+    const scorePercent =
+        maxMarks === 0 ? 0 : ((obtainedMarks / maxMarks) * 100).toFixed(2);
+
+    return {
+        totalQuestions,
+        correctCount,
+        wrongCount,
+        obtainedMarks,
+        maxMarks,
+        integrityPercent,
+        scorePercent
+    };
+}
+
+/* =====================
+   SUBMIT TEST WITH SOCKET.IO & SAVE TO DB
+===================== */
+async function submitTestWithSocket() {
+    try {
+        if (timerInterval) clearInterval(timerInterval);
+        if (webcamStream) webcamStream.getTracks().forEach(track => track.stop());
+
+        saveAnswer();
+
+        const examId = window.examId;
+        const studentId = localStorage.getItem("student_id") || localStorage.getItem("register_number");
+
+        if (!studentId) {
+            alert("Student ID / Register Number missing! Please log in again.");
+            return window.location.href = "profile.html";
+        }
+
+        const resultData = calculateResult(questions, answers, warningCount);
+
+        const payload = {
+            student_id: studentId,
+            exam_id: examId,
+            total_questions: resultData.totalQuestions,
+            correct_count: resultData.correctCount,
+            wrong_count: resultData.wrongCount,
+            obtained_marks: resultData.obtainedMarks,
+            max_marks: resultData.maxMarks,
+            score_percent: resultData.scorePercent,
+            integrity_percent: resultData.integrityPercent,
+            warningCount: warningCount,
+            answers
+        };
+
+        // ✅ POST to backend API (for persistence)
+        await fetch("http://localhost:3000/api/results/save", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+        });
+
+        // ✅ Socket.io event for real-time update
+        socket.emit("test-submitted", payload);
+        socket.emit("student_alert", {
+            exam_id: examId,
+            regno: studentId,
+            message: "Student submitted exam",
+            timestamp: new Date().toISOString()
+        });
+
+        localStorage.setItem("lastExamResult", JSON.stringify(payload));
+        window.location.href = `result.html?student_id=${payload.student_id}&exam_id=${payload.exam_id}`;
+
+    } catch (err) {
+        console.error("Error submitting test:", err);
+        alert("Failed to submit the test. Please try again.");
+    }
+}
+
+/* =====================
+   QUESTION DISPLAY
+===================== */
+function updateQuestion() {
+    if (!questions[currentQuestion]) return;
+    questionNumberElement.textContent = `Question ${currentQuestion+1} of ${totalQuestions}`;
+    questionTextElement.textContent = questions[currentQuestion].question;
+
+    optionsContainer.innerHTML = `
+        <label><input type="radio" name="option" value="A"> ${questions[currentQuestion].option_a}</label>
+        <label><input type="radio" name="option" value="B"> ${questions[currentQuestion].option_b}</label>
+        <label><input type="radio" name="option" value="C"> ${questions[currentQuestion].option_c}</label>
+        <label><input type="radio" name="option" value="D"> ${questions[currentQuestion].option_d}</label>
+    `;
+
+    if (answers[currentQuestion]) {
+        const selectedOption = optionsContainer.querySelector(`input[value="${answers[currentQuestion].selected_option}"]`);
+        if (selectedOption) selectedOption.checked = true;
+    }
+
+    prevBtn.disabled = currentQuestion === 0;
+    nextBtn.disabled = currentQuestion === totalQuestions - 1;
+
+    if (statuses[currentQuestion] === 'not-visited') statuses[currentQuestion] = 'visited';
+}
+
+/* =====================
+   NAVIGATION & PALETTE
+===================== */
+function navigateToQuestion(index) {
+    if (index < 0 || index >= totalQuestions) return;
+    currentQuestion = index;
+    updateQuestion();
+    updatePalette();
+}
+
+function initializePalette() {
+    [paletteA, paletteB, paletteC, paletteD].forEach(p => p.innerHTML = '');
+    for (let i = 0; i < totalQuestions; i++) {
+        const box = document.createElement('div');
+        box.className = 'num-box';
+        box.textContent = i+1;
+        box.dataset.index = i;
+        box.addEventListener('click', () => navigateToQuestion(i));
+
+        const section = Math.floor(i / questionsPerSection);
+        if (section === 0) paletteA.appendChild(box);
+        if (section === 1) paletteB.appendChild(box);
+        if (section === 2) paletteC.appendChild(box);
+        if (section === 3) paletteD.appendChild(box);
+    }
+    updatePalette();
+}
+
+function updatePalette() {
+    for (let i = 0; i < totalQuestions; i++) {
+        const section = Math.floor(i / questionsPerSection);
+        let palette = [paletteA, paletteB, paletteC, paletteD][section];
+        let box = palette.children[i % questionsPerSection];
+        box.className = 'num-box';
+        if (i === currentQuestion) box.classList.add('current');
+        if (statuses[i] === 'answered') box.classList.add('answered');
+        if (statuses[i] === 'not-answered') box.classList.add('not-answered');
+        if (statuses[i] === 'review') box.classList.add('review');
+    }
+}
+
+/* =====================
+   EVENT LISTENERS
+===================== */
+function setupEventListeners() {
+    prevBtn.addEventListener('click', () => { saveAnswer(); navigateToQuestion(currentQuestion-1); });
+    nextBtn.addEventListener('click', () => { saveAnswer(); navigateToQuestion(currentQuestion+1); });
+    optionsContainer.addEventListener('change', saveAnswer);
+    reviewBtn.addEventListener('click', markForReview);
+    clearBtn.addEventListener('click', clearResponse);
+
+    submitBtn.addEventListener('click', () => confirmationModal.style.display = 'flex');
+    cancelSubmitBtn.addEventListener('click', () => confirmationModal.style.display = 'none');
+    confirmSubmitBtn.addEventListener('click', submitTestWithSocket);
+    dismissWarningBtn.addEventListener('click', () => warningModal.style.display = 'none');
+
+    document.addEventListener('visibilitychange', () => {
+        if (document.hidden) triggerAIWarning("Tab Switch Detected","You switched tab/minimized","high");
+    });
+}
+
+
+/* =====================
+   WEBCAM & AI PROCTORING
+===================== */
+async function startWebcam() {
+    try {
+        webcamStream = await navigator.mediaDevices.getUserMedia({ video:{width:320,height:240}, audio:true });
+        webcamVideo.srcObject = webcamStream;
+        webcamPlaceholder.style.display = 'none';
+        webcamStatus.textContent = 'AI Monitoring: Active';
+        await initFaceDetection();
+        await initObjectDetection();
+        initAudioMonitoring();
+    } catch(e) {
+        console.error(e);
+        webcamStatus.textContent = 'Webcam Error';
+        webcamPlaceholder.innerHTML = '<p>Webcam Not Available</p>';
+    }
+}
+
+function stopWebcam() {
+    if (webcamStream) webcamStream.getTracks().forEach(t=>t.stop());
+}
+
+/* =====================================================
+   AI WARNING (🔥 THIS IS WHAT ADMIN COUNTS)
+   ✅ Now includes termination check after 5 warnings
+===================================================== */
+
+function triggerAIWarning(title, message, severity) {
+    warningCount++;
+    warningCountElement.textContent =
+        `${warningCount} Warning${warningCount !== 1 ? 's' : ''}`;
+
+    const payload = {
+        exam_id: window.examId,
+        regno: studentSocketId,
+        warning_type: title,
+        severity: severity
+    };
+
+    // ✅ 1. SAVE TO DATABASE
+    fetch("http://localhost:3000/api/admin/send-warning", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (!data.success) {
+            console.error("❌ Failed to save warning:", data);
+        } else {
+            console.log("✅ Warning saved to DB");
+        }
+    })
+    .catch(err => {
+        console.error("❌ Warning API error:", err);
+    });
+
+    // ✅ 2. REAL-TIME SOCKET EVENTS
+    socket.emit("student_violation", {
+        exam_id: window.examId,
+        regno: studentSocketId,
+        type: title,
+        severity,
+        timestamp: new Date().toISOString()
+    });
+
+    socket.emit("ai-warning", {
+        exam_id: window.examId,
+        regno: studentSocketId,
+        title,
+        message,
+        severity
+    });
+
+    // ✅ 3. UI WARNING MODAL
+    warningModal.style.display = 'flex';
+    document.getElementById('warningTitle').textContent = title;
+    document.getElementById('warningMessage').textContent = message;
+
+    // ✅ 4. TERMINATE IF EXCEEDED MAX AI WARNINGS (5)
+    if (warningCount > MAX_AI_WARNINGS) {
+        endExamDueToViolation(
+            "Excessive Rule Violations",
+            `Exceeded ${MAX_AI_WARNINGS} AI warnings`
+        );
+    }
+}
+
+
+/* =====================
+   AI PROCTORING CODE
+===================== */
+let faceMesh;
+let detectedFaces = 0;
+let faceHistory = [];
+let lookingAwayCount = 0;
+let noFaceFrames = 0;
+let aiMonitoringStarted = false;
+let objectModel;
+let audioContext, analyser, micSource;
+
+async function initFaceDetection() {
+    if (aiMonitoringStarted) return;
+    aiMonitoringStarted = true;
+
+    faceMesh = new FaceMesh({
+        locateFile: file => `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`
+    });
+
+    faceMesh.setOptions({
+        maxNumFaces: 2,
+        refineLandmarks: true,
+        minDetectionConfidence: 0.75,
+        minTrackingConfidence: 0.75
+    });
+
+    faceMesh.onResults(onFaceResults);
+
+    const camera = new Camera(webcamVideo, { 
+        onFrame: async () => await faceMesh.send({ image: webcamVideo }), 
+        width: 320, 
+        height: 240 
+    });
+    camera.start();
+}
+
+function onFaceResults(results) {
+    let facesThisFrame = 0;
+    if (results.multiFaceLandmarks) {
+        results.multiFaceLandmarks.forEach(face => {
+            if (face.length < 60) return;
+            let minX=1,maxX=0,minY=1,maxY=0;
+            face.forEach(landmark=>{
+                if(landmark.x<minX) minX=landmark.x;
+                if(landmark.x>maxX) maxX=landmark.x;
+                if(landmark.y<minY) minY=landmark.y;
+                if(landmark.y>maxY) maxY=landmark.y;
+            });
+            const width=maxX-minX;
+            const height=maxY-minY;
+            if(width>0.10 && height>0.10) facesThisFrame++;
+        });
+    }
+
+    faceHistory.push(facesThisFrame);
+    if(faceHistory.length>5) faceHistory.shift();
+    const avgFaces = faceHistory.reduce((a,b)=>a+b,0)/faceHistory.length;
+    detectedFaces = Math.round(avgFaces);
+
+    if(detectedFaces===0){
+        noFaceFrames++;
+        if(noFaceFrames>=15){
+            triggerAIWarning("No Face Detected","Face not visible","medium");
+            noFaceFrames=0;
+        }
+    } else noFaceFrames=0;
+
+    if(detectedFaces>1){
+        triggerAIWarning("Multiple Faces Detected","More than one person detected","high");
+    }
+
+    if(results.multiFaceLandmarks && results.multiFaceLandmarks[0]){
+        const nose = results.multiFaceLandmarks[0][1];
+        if(nose.x<0.25||nose.x>0.75){
+            lookingAwayCount++;
+            if(lookingAwayCount>15){
+                triggerAIWarning("Looking Away","User frequently looking away","medium");
+                lookingAwayCount=0;
+            }
+        } else lookingAwayCount=0;
+    }
+}
+
+async function initObjectDetection() {
+    objectModel = await cocoSsd.load();
+    setInterval(async () => {
+        if (!webcamVideo || webcamVideo.readyState !== 4) return;
+        const predictions = await objectModel.detect(webcamVideo);
+        predictions.forEach(p => { 
+            if (p.class === "cell phone" || p.class === "book") 
+                triggerAIWarning("Prohibited Object Detected", `${p.class.toUpperCase()} detected`, "high"); 
+        });
+    }, 4000);
+}
+
+/* =====================
+   AUDIO MONITORING - adjusted thresholds to avoid fast false detections
+===================== */
+function initAudioMonitoring() {
+    if (!webcamStream) return;
+
+    // Create audio context
+    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
+    // Function to resume audio context if suspended
+    const resumeAudio = () => {
+        if (audioContext.state === "suspended") {
+            audioContext.resume().then(() => {
+                console.log("AudioContext resumed successfully");
+            }).catch(err => console.warn("AudioContext resume failed:", err));
+        }
+    };
+
+    // Try to resume immediately and also on any user interaction
+    resumeAudio();
+    document.addEventListener("click", resumeAudio);
+    document.addEventListener("keydown", resumeAudio);
+    document.addEventListener("mousemove", resumeAudio, { once: true });
+
+    analyser = audioContext.createAnalyser();
+    analyser.fftSize = 256;
+    const bufferLength = analyser.frequencyBinCount;
+    const dataArray = new Uint8Array(bufferLength);
+
+    micSource = audioContext.createMediaStreamSource(webcamStream);
+    micSource.connect(analyser);
+
+    // Check audio every 2 seconds
+    setInterval(() => {
+        // If context suspended, try to resume
+        if (audioContext.state === "suspended") {
+            resumeAudio();
+            return;
+        }
+
+        analyser.getByteTimeDomainData(dataArray);
+
+        // Compute RMS (Root Mean Square) to detect energy
+        let sumSquares = 0;
+        for (let i = 0; i < bufferLength; i++) {
+            const normalized = (dataArray[i] - 128) / 128; // convert to -1..1
+            sumSquares += normalized * normalized;
+        }
+        const rms = Math.sqrt(sumSquares / bufferLength);
+
+        // Also compute average absolute deviation (simple volume)
+        let sumAbs = 0;
+        for (let i = 0; i < bufferLength; i++) {
+            sumAbs += Math.abs(dataArray[i] - 128);
+        }
+        const avgDeviation = sumAbs / bufferLength;
+
+        // Higher thresholds to prevent false positives from background noise
+        if (rms > 0.025 || avgDeviation > 5.0) {
+            triggerAIWarning("Background Noise", "Unusual audio detected", "low");
+        }
+    }, 2000);
+}
+
+webcamVideo.addEventListener('loadeddata',()=>{
+    initFaceDetection();
+    initObjectDetection();
+    initAudioMonitoring();
+});
+</script>
+
+
+</body>
+
+</html>

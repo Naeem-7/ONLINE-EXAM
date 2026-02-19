@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Upload Questions - AI Exam Proctoring</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        background: linear-gradient(135deg, 100%);
+        font-family: "Poppins", sans-serif;
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .container {
+        max-width: 850px;
+        width: 90%;
+        margin: 40px auto;
+        background: white;
+        padding: 40px;
+        border-radius: 12px;
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+        border: 1px solid #e1e8f0;
+        position: relative;
+    }
+
+    h2 {
+        text-align: center;
+        color: #1e3c72;
+        font-size: 28px;
+        margin-bottom: 30px;
+        font-weight: 700;
+    }
+
+    h3 {
+        color: #1e3c72;
+        margin-top: 25px;
+        font-size: 20px;
+        font-weight: 600;
+        border-bottom: 2px solid #2a5298;
+        padding-bottom: 8px;
+    }
+
+    label {
+        font-size: 15px;
+        font-weight: 600;
+        color: #2d3748;
+        display: block;
+        margin-top: 15px;
+    }
+
+    input[type="text"],
+    textarea,
+    select {
+        width: 100%;
+        padding: 12px;
+        margin: 8px 0 20px;
+        border-radius: 8px;
+        border: 1px solid #cbd5e0;
+        font-size: 15px;
+        transition: all 0.3s ease;
+        background: #f8fafc;
+        box-sizing: border-box;
+    }
+
+    input[type="text"]:focus,
+    textarea:focus,
+    select:focus {
+        outline: none;
+        border-color: #2a5298;
+        box-shadow: 0 0 0 3px rgba(42, 82, 152, 0.1);
+        background: white;
+    }
+
+    textarea {
+        height: 120px;
+        resize: vertical;
+    }
+
+    .upload-box {
+        background: #f8fafc;
+        border: 2px dashed #a0aec0;
+        padding: 30px 20px;
+        text-align: center;
+        border-radius: 10px;
+        margin-bottom: 25px;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        position: relative;
+    }
+
+    .upload-box:hover {
+        background: #edf2f7;
+        border-color: #2a5298;
+    }
+
+    .upload-box p {
+        color: #4a5568;
+        font-size: 16px;
+        margin: 10px 0;
+    }
+
+    button {
+        background: #2a5298;
+        color: white;
+        padding: 12px 24px;
+        border: none;
+        font-size: 16px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 600;
+        margin-top: 10px;
+        transition: all 0.3s ease;
+        display: block;
+        width: 100%;
+    }
+
+    button:hover {
+        background: #1e3c72;
+        box-shadow: 0 5px 15px rgba(30, 60, 114, 0.2);
+    }
+
+    .divider {
+        width: 100%;
+        height: 1.8px;
+        background: linear-gradient(90deg, transparent, #cbd5e0, transparent);
+        margin: 35px 0;
+    }
+
+    .success {
+        color: #2d8f5b;
+        font-weight: bold;
+        margin-top: 10px;
+        padding: 12px;
+        background: #f0fff4;
+        border-radius: 8px;
+        text-align: center;
+        border-left: 4px solid #2d8f5b;
+    }
+
+    .list-box {
+        background: #f8f9fc;
+        padding: 20px;
+        border-radius: 10px;
+        border: 1px solid #e2e8f0;
+        margin-top: 20px;
+        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+
+    #qList {
+        list-style-type: none;
+        padding: 0;
+    }
+
+    #qList li {
+        background: white;
+        margin-bottom: 15px;
+        padding: 15px;
+        border-radius: 8px;
+        border-left: 4px solid #2a5298;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    }
+
+    #qList li b {
+        color: #1e3c72;
+    }
+
+    #fileInput {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        opacity: 0;
+        cursor: pointer;
+    }
+
+    .instructions {
+        background: #ebf8ff;
+        padding: 12px 15px;
+        border-radius: 8px;
+        margin-bottom: 25px;
+        border-left: 4px solid #2a5298;
+        font-size: 14px;
+        color: #2d3748;
+    }
+
+    .instructions p {
+        margin: 5px 0;
+    }
+
+    @media (max-width: 768px) {
+        .container {
+            padding: 25px;
+            margin: 20px auto;
+            width: 95%;
+        }
+        
+        h2 {
+            font-size: 24px;
+        }
+        
+        h3 {
+            font-size: 18px;
+        }
+        
+        body {
+            padding: 15px;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+        }
+    }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+    <h2>Upload Questions</h2>
+
+    <!-- Bulk Upload Section -->
+    <h3>Upload Questions (Bulk Upload)</h3>
+    <p style="color:#555;">Upload MCQ questions in DOC format.</p>
+    
+    <div class="instructions">
+        <p><b>Supported format:</b> DOC</p>
+        <p><b>Max file size:</b> 10MB</p>
+    </div>
+
+    <div class="upload-box">
+        <p><b>Drag & Drop files here</b><br>or click below to choose a file</p>
+        <input id="fileInput" type="file" accept=".doc">
+    </div>
+
+    <button id="uploadBtn">Upload File</button>
+
+    <p id="uploadStatus" class="success"></p>
+
+    <div class="divider"></div>
+
+    <!-- Manual Question Entry -->
+    <h3>Add Question Manually</h3>
+
+    <label>Question:</label>
+    <textarea id="qText" placeholder="Enter the MCQ question here..."></textarea>
+
+    <label>Option A:</label>
+    <input id="optA" type="text" placeholder="Enter option A">
+
+    <label>Option B:</label>
+    <input id="optB" type="text" placeholder="Enter option B">
+
+    <label>Option C:</label>
+    <input id="optC" type="text" placeholder="Enter option C">
+
+    <label>Option D:</label>
+    <input id="optD" type="text" placeholder="Enter option D">
+
+    <label>Correct Answer:</label>
+    <select id="correctAns">
+        <option value="">Select</option>
+        <option value="A">Option A</option>
+        <option value="B">Option B</option>
+        <option value="C">Option C</option>
+        <option value="D">Option D</option>
+    </select>
+
+   <button id="addBtn">Add Question</button>
+
+    <p id="addStatus" class="success"></p>
+
+    <div id="questionList" class="list-box" style="display:none;">
+        <h4>Added Questions:</h4>
+        <ul id="qList"></ul>
+    </div>
+
+</div>
+
+<!-- JavaScript -->
+<script>
+/* ===========================
+   GET exam_id FROM URL
+=========================== */
+const params = new URLSearchParams(window.location.search);
+const EXAM_ID = params.get("exam_id");
+
+// ✅ Only show warning if exam_id is completely missing
+if (!EXAM_ID) {
+    alert("Exam ID not found! Please create the exam first.");
+}
+
+/* ===========================
+   BULK UPLOAD QUESTIONS
+=========================== */
+function uploadFile() {
+    const file = document.getElementById("fileInput").files[0];
+
+    if (!file) {
+        alert("Please choose a file first!");
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append("exam_id", EXAM_ID);
+    formData.append("file", file);
+
+    fetch("http://localhost:3000/api/upload/questions", {
+        method: "POST",
+        body: formData
+    })
+    .then(async response => {
+        if (!response.ok) {
+            const text = await response.text();
+            console.error("Upload error:", text);
+            alert("Bulk upload failed.");
+            return null;
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (!data) return;
+
+        if (!data.success) {
+            alert(data.message);
+            return;
+        }
+
+        const totalMsg = data.total ? `Total questions added: ${data.total}` : '';
+        document.getElementById("uploadStatus").innerText =
+            `Bulk upload successful! ${totalMsg} ${data.message || ''}`;
+
+        document.getElementById("fileInput").value = "";
+    })
+    .catch(error => {
+        console.error(error);
+        alert("Server error during bulk upload. Please try again.");
+    });
+}
+
+/* ===========================
+   ADD SINGLE QUESTION
+=========================== */
+function addQuestion() {
+    if (!EXAM_ID) {
+        alert("Cannot add question: Exam ID is missing!");
+        return;
+    }
+
+    // ✅ Convert exam_id to integer
+    const exam_id_int = parseInt(EXAM_ID, 10);
+    if (isNaN(exam_id_int)) {
+        alert("Invalid Exam ID!");
+        return;
+    }
+
+    const q = document.getElementById("qText").value.trim();
+    const a = document.getElementById("optA").value.trim();
+    const b = document.getElementById("optB").value.trim();
+    const c = document.getElementById("optC").value.trim();
+    const d = document.getElementById("optD").value.trim();
+    let correct = document.getElementById("correctAns").value.trim().toUpperCase();
+
+    if (!q || !a || !b || !c || !d || !correct) {
+        alert("Please fill all fields!");
+        return;
+    }
+
+    // ✅ Validate correct answer
+    if (!["A","B","C","D"].includes(correct)) {
+        alert("Correct answer must be A, B, C, or D!");
+        return;
+    }
+
+    // ✅ Payload matches DB exactly
+    const payload = {
+        exam_id: exam_id_int,
+        question: q,
+        option_a: a,
+        option_b: b,
+        option_c: c,
+        option_d: d,
+        correct_answer: correct
+    };
+
+    /* 🔧 FIXED ENDPOINT HERE */
+    fetch("http://localhost:3000/api/questions", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
+    })
+    .then(async response => {
+        if (!response.ok) {
+            const text = await response.text();
+            console.error("Add question error:", text);
+            alert("Failed to add question.");
+            return null;
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (!data) return;
+
+        if (!data.success) {
+            alert(data.message);
+            return;
+        }
+
+        const list = document.getElementById("qList");
+        const item = document.createElement("li");
+
+        item.innerHTML = `
+            <b>Q:</b> ${q}<br>
+            <b>A:</b> ${a} | <b>B:</b> ${b} |
+            <b>C:</b> ${c} | <b>D:</b> ${d}<br>
+            <b>Correct:</b> ${correct}<br><br>
+        `;
+
+        list.appendChild(item);
+
+        document.getElementById("questionList").style.display = "block";
+        document.getElementById("addStatus").innerText =
+            "Question added successfully!";
+
+        document.getElementById("qText").value = "";
+        document.getElementById("optA").value = "";
+        document.getElementById("optB").value = "";
+        document.getElementById("optC").value = "";
+        document.getElementById("optD").value = "";
+        document.getElementById("correctAns").value = "";
+    })
+    .catch(error => {
+        console.error(error);
+        alert("Server error. Please try again.");
+    });
+}
+
+/* ===========================
+   BIND BUTTONS TO FUNCTIONS
+=========================== */
+document.getElementById("uploadBtn").addEventListener("click", uploadFile);
+document.getElementById("addBtn").addEventListener("click", addQuestion);
+</script>
+
+
+</body>
+</html> 

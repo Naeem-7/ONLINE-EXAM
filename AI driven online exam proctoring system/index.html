@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>aiProctor · intelligent exam monitoring</title>
+  <style>
+    /* subtle, refined, homepage structure – warm & minimal */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, sans-serif;
+      background-color: #faf8f6;   /* soft linen */
+      color: #2c2f33;
+      line-height: 1.5;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    /* navigation – simple, with better colours */
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2.5rem;
+      background: #ffffffec;
+      backdrop-filter: blur(6px);
+      border-bottom: 1px solid #e0d7cf;
+      flex-wrap: wrap;
+      gap: 1rem;
+      position: relative;  /* for dropdown positioning */
+    }
+
+    .logo a {
+      font-weight: 520;
+      font-size: 1.45rem;
+      letter-spacing: -0.3px;
+      color: #4d637b;
+      text-decoration: none;
+      background: #f0ebe5;
+      padding: 0.2rem 1.4rem;
+      border-radius: 40px;
+      border: 1px solid #d6cbbc;
+      transition: background 0.2s;
+    }
+
+    .logo a:hover {
+      background: #e7dfd6;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+      align-items: center;
+      position: relative;
+    }
+
+    .nav-links a {
+      text-decoration: none;
+      font-size: 1.1rem;
+      padding: 0.5rem 1.5rem;
+      border-radius: 40px;
+      transition: all 0.2s;
+      font-weight: 470;
+      border: 1px solid transparent;
+    }
+
+    .register-link {
+      background: #ece6df;
+      color: #386282;
+      border: 1px solid #cec2b6;
+    }
+
+    .register-link:hover {
+      background: #e2d9cf;
+      border-color: #a99e92;
+      color: #2d4f6e;
+    }
+
+    .login-link {
+      background: #faf7f3;
+      color: #4e6073;
+      border: 1px solid #d4cbc1;
+      cursor: pointer;
+    }
+
+    .login-link:hover {
+      background: #f1ece4;
+      border-color: #b7aca0;
+      color: #354b60;
+    }
+
+    /* dropdown menu – small, subtle */
+    .login-dropdown {
+      position: absolute;
+      top: calc(100% + 12px);
+      right: 0;
+      background: #ffffff;
+      border: 1px solid #ddd2c6;
+      border-radius: 24px;
+      padding: 0.6rem;
+      min-width: 180px;
+      box-shadow: 0 8px 20px -8px rgba(70, 60, 45, 0.15);
+      backdrop-filter: blur(4px);
+      z-index: 10;
+      display: none;
+    }
+
+    .login-dropdown.show {
+      display: block;
+    }
+
+    .login-dropdown a {
+      display: block;
+      padding: 0.7rem 1.4rem;
+      border-radius: 30px;
+      text-decoration: none;
+      font-size: 1rem;
+      font-weight: 450;
+      color: #3d546d;
+      transition: background 0.15s;
+      border: none;
+      background: transparent;
+      text-align: left;
+    }
+
+    .login-dropdown a:hover {
+      background: #f2ece4;
+      color: #253c53;
+    }
+
+    /* caret / indicator (optional) */
+    .login-link::after {
+      content: " ▼";
+      font-size: 0.7rem;
+      opacity: 0.7;
+      display: inline-block;
+      margin-left: 4px;
+    }
+
+    /* main homepage layout */
+    .home-container {
+      flex: 1;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem 2rem 1rem;
+      width: 100%;
+    }
+
+    /* hero section – brief description, welcoming */
+    .hero {
+      text-align: center;
+      margin: 1.5rem 0 3rem 0;
+    }
+
+    .hero h1 {
+      font-size: 2.8rem;
+      font-weight: 460;
+      letter-spacing: -0.5px;
+      color: #324a62;
+      margin-bottom: 1.2rem;
+      line-height: 1.2;
+    }
+
+    .hero .subhead {
+      font-size: 1.3rem;
+      color: #4c5f73;
+      max-width: 750px;
+      margin: 0 auto 1.8rem auto;
+      font-weight: 340;
+      background: #f2eee9;
+      padding: 0.8rem 1.8rem;
+      border-radius: 60px;
+      border: 1px solid #ddd3c8;
+      backdrop-filter: blur(2px);
+    }
+
+    .hero-description {
+      max-width: 820px;
+      margin: 0 auto;
+      background: #fffffffa;
+      padding: 2rem 2.5rem;
+      border-radius: 42px;
+      box-shadow: 0 12px 28px -12px rgba(70, 60, 45, 0.12);
+      border: 1px solid #e2d8ce;
+      text-align: left;
+    }
+
+    .hero-description p {
+      font-size: 1.2rem;
+      color: #3e4b59;
+      margin-bottom: 1.3rem;
+      font-weight: 360;
+    }
+
+    .hero-description .accent {
+      background: #f0eae2;
+      padding: 0.2rem 0.7rem;
+      border-radius: 30px;
+      font-weight: 440;
+      color: #385370;
+      border: 1px solid #d7ccc0;
+      white-space: nowrap;
+    }
+
+    /* features grid – expands the brief description */
+    .features {
+      margin: 4rem 0 2.5rem;
+    }
+
+    .features h2 {
+      font-size: 2rem;
+      font-weight: 430;
+      color: #3d556d;
+      text-align: center;
+      margin-bottom: 2.2rem;
+      letter-spacing: -0.3px;
+    }
+
+    .feature-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.8rem;
+      justify-content: center;
+    }
+
+    .feature-card {
+      background: #fffffffa;
+      border: 1px solid #e1d7cd;
+      border-radius: 36px;
+      padding: 1.8rem 1.6rem;
+      width: 260px;
+      text-align: center;
+      backdrop-filter: blur(2px);
+      box-shadow: 0 6px 16px -8px rgba(70, 60, 50, 0.08);
+      transition: transform 0.1s ease;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-3px);
+      border-color: #cbbcae;
+    }
+
+    .feature-icon {
+      font-size: 2.4rem;
+      margin-bottom: 1rem;
+      opacity: 0.85;
+    }
+
+    .feature-card h3 {
+      font-weight: 500;
+      font-size: 1.3rem;
+      color: #3a4e66;
+      margin-bottom: 0.6rem;
+    }
+
+    .feature-card p {
+      font-size: 0.95rem;
+      color: #536573;
+      font-weight: 350;
+    }
+
+    /* subtle extra info / trust section */
+    .info-row {
+      display: flex;
+      justify-content: center;
+      margin: 3rem 0 2rem;
+      background: #f3eee8;
+      border-radius: 80px;
+      padding: 1.2rem 2rem;
+      border: 1px solid #d7cdc1;
+      flex-wrap: wrap;
+      gap: 1.5rem 3rem;
+    }
+
+    .info-item {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      color: #435b73;
+      font-weight: 430;
+    }
+
+    .info-item span:first-child {
+      font-size: 1.4rem;
+    }
+
+    /* footer */
+    .page-footer {
+      text-align: center;
+      padding: 1.5rem;
+      color: #7a8b9b;
+      border-top: 1px solid #e1d7cf;
+      background: #fcfaf7;
+      font-size: 0.9rem;
+      margin-top: 1rem;
+    }
+
+    /* responsive */
+    @media (max-width: 650px) {
+      .navbar {
+        padding: 1rem 1.5rem;
+      }
+      .hero h1 {
+        font-size: 2.2rem;
+      }
+      .hero .subhead {
+        font-size: 1.1rem;
+        padding: 0.6rem 1rem;
+      }
+      .hero-description {
+        padding: 1.5rem;
+      }
+      .feature-card {
+        width: 100%;
+        max-width: 320px;
+      }
+      .info-row {
+        border-radius: 40px;
+        padding: 1rem 1.2rem;
+      }
+      .login-dropdown {
+        right: auto;
+        left: 0;
+      }
+    }
+
+    a:focus-visible {
+      outline: 2px solid #a09588;
+      outline-offset: 2px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- navigation: register (student only, but no label) + login with dropdown -->
+  <nav class="navbar">
+    <div class="logo">
+      <a href="#">✦ aiProctor</a>
+    </div>
+    <div class="nav-links">
+      <!-- register link now points to signup.html -->
+      <a href="signup.html" class="register-link" id="registerLink">register</a>
+      <!-- login link triggers dropdown -->
+      <a href="#" class="login-link" id="loginLink">login</a>
+      <!-- dropdown menu for admin/student login with updated links -->
+      <div class="login-dropdown" id="loginDropdown">
+        <a href="admin_login.html" id="adminLogin">admin login</a>
+        <a href="login.html" id="studentLogin">student login</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- main homepage content -->
+  <div class="home-container">
+    <!-- hero with brief description -->
+    <section class="hero">
+      <h1>AI-driven online exam proctoring</h1>
+      <div class="subhead">maintain integrity — without friction</div>
+      <div class="hero-description">
+        <p>
+          Our system combines <span class="accent">real-time computer vision</span> and 
+          <span class="accent">behavioural analytics</span> to detect irregularities 
+          while respecting test‑taker privacy. Facial recognition, gaze tracking, 
+          and ambient sound analysis work in tandem — all through a standard webcam.
+        </p>
+        <p>
+          <strong>Low‑latency alerts</strong> for instructors, secure session management, 
+          and transparent reporting. Students experience a calm, fair environment 
+          with minimal disruption.
+        </p>
+      </div>
+    </section>
+
+    <!-- feature grid: expands the brief description into a homepage style -->
+    <section class="features">
+      <h2>key capabilities</h2>
+      <div class="feature-grid">
+        <div class="feature-card">
+          <div class="feature-icon">🧑‍🎓</div>
+          <h3>face verification</h3>
+          <p>Continuous identity check using subtle liveness detection.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">👁️</div>
+          <h3>gaze & head pose</h3>
+          <p>Estimate attention and flag unusual head movements.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🔇</div>
+          <h3>ambient sound</h3>
+          <p>Detect unexpected voices or noises without recording.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">📎</div>
+          <h3>tab/window focus</h3>
+          <p>Alert on tab switching or copy attempts.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- subtle info row – reinforces student/admin messaging -->
+    <div class="info-row">
+      <div class="info-item">
+        <span>🧑‍🎓</span> <span>student registration only</span>
+      </div>
+      <div class="info-item">
+        <span>🛡️</span> <span>admin / faculty login</span>
+      </div>
+      <div class="info-item">
+        <span>⚙️</span> <span>works with any webcam</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- footer -->
+  <footer class="page-footer">
+    ✦ aiProctor — subtle, intelligent proctoring for modern education
+  </footer>
+
+  <script>
+    (function() {
+      const registerBtn = document.getElementById('registerLink');
+      const loginLink = document.getElementById('loginLink');
+      const dropdown = document.getElementById('loginDropdown');
+      const adminLogin = document.getElementById('adminLogin');
+      const studentLogin = document.getElementById('studentLogin');
+
+      // Toggle dropdown on login link click (prevent default so it doesn't try to navigate)
+      if (loginLink) {
+        loginLink.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          dropdown.classList.toggle('show');
+        });
+      }
+
+      // For admin and student login links: just close dropdown and let them navigate normally
+      if (adminLogin) {
+        adminLogin.addEventListener('click', function(e) {
+          // Do NOT prevent default — navigation to admin_login.html will happen
+          dropdown.classList.remove('show');
+        });
+      }
+
+      if (studentLogin) {
+        studentLogin.addEventListener('click', function(e) {
+          // Do NOT prevent default — navigation to login.html will happen
+          dropdown.classList.remove('show');
+        });
+      }
+
+      // Close dropdown if clicking outside
+      document.addEventListener('click', function(event) {
+        if (!loginLink.contains(event.target) && !dropdown.contains(event.target)) {
+          dropdown.classList.remove('show');
+        }
+      });
+
+      // Register link now simply navigates to signup.html (no intervention)
+      // (We leave it as is; no need to attach any listener)
+
+      // Prevent logo navigation for demo (optional)
+      document.querySelector('.logo a')?.addEventListener('click', (e) => e.preventDefault());
+    })();
+  </script>
+</body>
+</html>

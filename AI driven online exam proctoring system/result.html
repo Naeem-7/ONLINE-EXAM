@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Exam Result</title>
+
+    <!-- External Libraries -->
+    <script src="https://unpkg.com/html-docx-js@0.3.1/dist/html-docx.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+
+    <!-- Styles -->
+    <style>
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background: linear-gradient(135deg, #f0f9ff 0%, #e6f7ff 100%);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .result-card { 
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 20px;
+            max-width: 800px;
+            width: 90%;
+            margin: 20px auto;
+            box-shadow: 0 10px 30px rgba(0, 150, 200, 0.15);
+            border: 1px solid rgba(0, 150, 200, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        h2 { text-align: center; color: #0077b6; margin-bottom: 30px; font-size: 28px; font-weight: 700; }
+        .student-info { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px; margin-bottom: 30px; background: #f8fdff; padding: 25px; border-radius: 15px; border: 1px solid #e0f7ff; }
+        .student-info p { margin: 0; display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px dashed #e0f7ff; }
+        .student-info p:last-child { border-bottom: none; }
+        .student-info strong { color: #0077b6; font-weight: 600; min-width: 160px; }
+        .student-info span { color: #333; font-weight: 500; text-align: right; flex: 1; }
+        table { width: 100%; border-collapse: collapse; margin: 30px 0; }
+        table, th, td { border: 1px solid #0077b6; }
+        th, td { padding: 12px 15px; text-align: left; }
+        th { background: #0077b6; color: #fff; }
+        tbody tr:nth-child(even) { background: #f8fdff; }
+        tbody tr:nth-child(odd) { background: #ffffff; }
+        .score-btn { display: block; text-align: center; background: #0077b6; color: #ffffff; padding: 15px; margin: 30px auto 20px; border-radius: 10px; font-weight: 700; font-size: 20px; width: 100%; max-width: 250px; }
+        .download-btn { display: block; text-align: center; background: #00b4d8; color: #fff; padding: 12px 25px; margin: 10px auto; border-radius: 10px; font-weight: 600; width: 100%; max-width: 220px; border: none; cursor: pointer; }
+        @media print {
+            body { background: white; padding: 0; }
+            .result-card { box-shadow: none; border: 1px solid #ddd; }
+            .download-btn { display: none; }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="result-card">
+        <h2>Exam Result</h2>
+
+        <div class="student-info">
+            <p><strong>Name:</strong> <span id="studentName"></span></p>
+            <p><strong>Register Number:</strong> <span id="registerNumber"></span></p>
+            <p><strong>Class:</strong> <span id="studentClass"></span></p>
+            <p><strong>Department:</strong> <span id="department"></span></p>
+            <p><strong>Subject:</strong> <span id="subject"></span></p>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Category</th>
+                    <th>Value</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>Total Questions</td><td id="totalQuestions"></td></tr>
+                <tr><td>Correct</td><td id="correct"></td></tr>
+                <tr><td>Wrong</td><td id="wrong"></td></tr>
+                <tr><td>Total Marks</td><td id="totalMarks"></td></tr>
+                <tr><td>Integrity Percent</td><td id="integrity"></td></tr>
+            </tbody>
+        </table>
+
+        <div class="score-btn" id="scorePercentage"><span>Score: 0%</span></div>
+        <button class="download-btn" id="downloadResult">Download Result</button>
+    </div>
+
+    <!-- All Script at bottom -->
+<script>
+/* =====================
+   FETCH STUDENT RESULT
+===================== */
+
+// Helper: Read URL query parameters
+function getQueryParams() {
+    const params = {};
+    location.search.substring(1).split("&").forEach(pair => {
+        const [key, value] = pair.split("=");
+        params[decodeURIComponent(key)] = decodeURIComponent(value || "");
+    });
+    return params;
+}
+
+document.addEventListener("DOMContentLoaded", async () => {
+    const params = getQueryParams();
+    const studentId = params.student_id;
+    const examName = params.exam_name;
+
+    let storedResult = null;
+
+    // ---------------------
+    // Case 1: Admin view with URL params
+    // ---------------------
+    if (studentId && examName) {
+        try {
+            // Fetch specific student+exam from backend
+            const res = await fetch(`http://localhost:3000/api/results?student_id=${encodeURIComponent(studentId)}&exam_name=${encodeURIComponent(examName)}`);
+            const data = await res.json();
+
+            if (!data.success || !data.data) {
+                alert(`No result found for ${studentId} - ${examName}`);
+                window.location.href = "admin_reports.html";
+                return;
+            }
+
+            storedResult = data.data;
+
+        } catch (err) {
+            console.error(err);
+            alert("Error loading result from server.");
+            window.location.href = "admin_reports.html";
+            return;
+        }
+    }
+
+    // ---------------------
+    // Case 2: Student view using localStorage
+    // ---------------------
+    if (!storedResult) {
+        storedResult = JSON.parse(localStorage.getItem("lastExamResult"));
+        if (!storedResult) {
+            alert("No exam result found. Please submit the exam first.");
+            window.location.href = "student_dashboard.html";
+            return;
+        }
+    }
+
+    // ---------------------
+    // NORMALIZE DATA
+    // ---------------------
+    storedResult.student_id =
+        storedResult.student_id || localStorage.getItem("student_id") || "unknown";
+    storedResult.student_name =
+        storedResult.student_name || localStorage.getItem("student_name") || "Unknown";
+    storedResult.register_number =
+        storedResult.register_number || storedResult.student_id || localStorage.getItem("register_number");
+    storedResult.dob = storedResult.dob || localStorage.getItem("dob") || "";
+    storedResult.classvalue = storedResult.classvalue || localStorage.getItem("classvalue") || "";
+    storedResult.department = storedResult.department || localStorage.getItem("department") || "";
+    storedResult.subject = storedResult.subject || localStorage.getItem("exam_title") || "";
+    storedResult.total_questions = Number(storedResult.total_questions) || 0;
+    storedResult.correct_count = Number(storedResult.correct_count) || 0;
+    storedResult.wrong_count = Number(storedResult.wrong_count) || (storedResult.total_questions - storedResult.correct_count);
+    storedResult.obtained_marks = Number(storedResult.obtained_marks) || 0;
+    storedResult.max_marks = Number(storedResult.max_marks) || storedResult.total_questions;
+    storedResult.integrity_percent = Number(storedResult.integrity_percent) || 100;
+    storedResult.score_percent = storedResult.max_marks > 0
+        ? ((storedResult.obtained_marks / storedResult.max_marks) * 100).toFixed(2)
+        : "0.00";
+
+    // Save normalized data back (optional)
+    localStorage.setItem("lastExamResult", JSON.stringify(storedResult));
+
+    const data = storedResult;
+
+    // ---------------------
+    // POPULATE RESULT PAGE
+    // ---------------------
+    document.getElementById("studentName").innerText = data.student_name;
+    document.getElementById("registerNumber").innerText = data.register_number;
+    document.getElementById("studentClass").innerText = data.classvalue;
+    document.getElementById("department").innerText = data.department;
+    document.getElementById("subject").innerText = data.subject;
+    document.getElementById("totalQuestions").innerText = data.total_questions;
+    document.getElementById("correct").innerText = data.correct_count;
+    document.getElementById("wrong").innerText = data.wrong_count;
+    document.getElementById("totalMarks").innerText = `${data.obtained_marks} / ${data.max_marks}`;
+    document.getElementById("integrity").innerText = data.integrity_percent + "%";
+    document.getElementById("scorePercentage").innerText = `Score: ${data.score_percent}%`;
+
+    // ---------------------
+    // DOWNLOAD RESULT AS DOCX
+    // ---------------------
+    document.getElementById("downloadResult").addEventListener("click", function () {
+        const resultCard = document.querySelector(".result-card");
+        const htmlForDocx = document.implementation.createHTMLDocument("Exam Result");
+        htmlForDocx.body.appendChild(resultCard.cloneNode(true));
+
+        const fileName = `ExamResult_${data.register_number || data.student_id || "unknown"}.docx`;
+        const converted = htmlDocx.asBlob(htmlForDocx.documentElement.outerHTML);
+        saveAs(converted, fileName);
+    });
+});
+</script>
+
+
+
+
+</body>
+</html>
