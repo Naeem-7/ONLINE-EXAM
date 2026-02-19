@@ -1,7 +1,3 @@
-# Backend
 online-exam-backend/node_modules/
-online-exam-backend/.env
 online-exam-backend/uploads/
-
-# Logs
-*.log
+online-exam-backend/.env
